@@ -36,3 +36,33 @@
     transform: rotate(360deg);
   }
 }
+
+.custom-bg {
+  background-color: #491ac9; 
+  min-height: 100vh; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn {
+  margin-bottom: 10px; 
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between label and input */
+  margin-bottom: 1rem; /* Space between each input group */
+}
+
+.input-wrapper .form-label {
+  flex: 0 0 150px; /* Fixed width for the labels */
+  margin-bottom: 0; /* Remove default margin */
+  text-align: left; /* Align labels to the left */
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+  min-width: 0;
+}
