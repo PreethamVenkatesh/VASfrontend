@@ -43,7 +43,8 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("Login successful", data);
+        console.log("Login successful", data.token);
+        localStorage.setItem('token', data.token); // Save token to local storage
         navigate('/home'); 
       } else {
         console.log(data.msg);
