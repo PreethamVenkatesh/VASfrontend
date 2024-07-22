@@ -34,7 +34,7 @@ function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('/api/products/login', {
+      const response = await fetch('http://localhost:8888/api/login', { // Update the URL as needed
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emailId: email, password })
@@ -44,8 +44,8 @@ function Login() {
 
       if (response.ok) {
         console.log("Login successful", data.token);
-        // Save token to local storage or state management
-        navigate('/');
+        localStorage.setItem('token', data.token); // Save token to local storage
+        navigate('/home'); 
       } else {
         console.log(data.msg);
       }
