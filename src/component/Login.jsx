@@ -10,7 +10,7 @@ import {
   MDBIcon,
   MDBInput
 } from 'mdb-react-ui-kit';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import ambulanceImage from '../images/Ambulance4.jpg';
 
 function Login() {
@@ -29,7 +29,7 @@ function Login() {
   };
 
   const handleSignupTypeSelect = (type) => {
-    navigate('/signup', { state: { signupType: type } });
+    navigate('/signup', { state: { signupType: type }});
   };
 
   const handleLogin = async () => {
@@ -74,9 +74,12 @@ function Login() {
                     <MDBBtn className="me-3" color='dark' onClick={() => handleSignupTypeSelect('volunteer')}>
                       Signup as Volunteer
                     </MDBBtn>
-                    <MDBBtn className="me-3" color='dark' onClick={() => handleSignupTypeSelect('serviceRequester')}>
+                    <NavLink to={"custregister"}>
+
+                    <MDBBtn className="me-3" color='dark'>
                       Signup as Service Requester
                     </MDBBtn>
+                    </NavLink>
                     <div className='d-flex flex-row justify-content-start'>
                       <a href="#!" className="small text-muted me-1">Terms of use.</a>
                       <a href="#!" className="small text-muted">Privacy policy</a>
