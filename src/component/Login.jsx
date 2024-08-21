@@ -26,6 +26,10 @@ function Login() {
     navigate('/signup', { state: { signupType: type } });
   };
 
+  const handleSignupTypeSelect1 = (type) => {
+    navigate('/custregister', { state: { signupType: type } });
+  };
+
   const handleLogin = async () => {
     try {
       const response = await fetch('http://localhost:8888/api/login', { // Update the URL as needed
@@ -61,7 +65,7 @@ function Login() {
             <MDBBtn className="me-3" color='dark' onClick={() => handleSignupTypeSelect('volunteer')}>
               Signup as Volunteer
             </MDBBtn>
-            <MDBBtn className="me-3" color='dark' onClick={() => handleSignupTypeSelect('serviceRequester')}>
+            <MDBBtn className="me-3" color='dark' onClick={() => handleSignupTypeSelect1('serviceRequester')}>
               Signup as Service Requester
             </MDBBtn>
             <div className='d-flex flex-row justify-content-start'>
