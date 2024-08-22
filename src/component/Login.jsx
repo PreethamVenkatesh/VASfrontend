@@ -32,7 +32,11 @@ function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:8888/api/login', { // Update the URL as needed
+      const apiUrl = loginType === 'volunteer' 
+        ? 'http://localhost:8888/api/login' 
+        : 'http://localhost:8888/api/custlogin';
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emailId: email, password })
@@ -43,7 +47,12 @@ function Login() {
       if (response.ok) {
         console.log("Login successful", data.token);
         localStorage.setItem('token', data.token); // Save token to local storage
-        navigate('/home'); 
+
+        if (loginType === 'volunteer') {
+          navigate('/home'); // Navigate to HomePage for volunteers
+        } else {
+          navigate('/customerPage'); // Navigate to Customer Page for service requesters
+        }
       } else {
         console.log(data.msg);
       }
