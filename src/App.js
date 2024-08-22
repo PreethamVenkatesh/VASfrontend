@@ -6,6 +6,7 @@ import CustomerDashboard from './component/CustomerDashboard';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import SignUpRequester from './component/SignUpRequester';
+import PastAssist from './component/PastAssist';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/custregister" element={<SignUpRequester />} />
+          <Route path='/pastAssist' element={PastAssist} />
           <Route
             path="/home"
             element={
@@ -24,7 +26,7 @@ function App() {
             }
           />
           <Route
-            path="/home"
+            path="/customerPage"
             element={
               <security>
                 <CustomerDashboard />
