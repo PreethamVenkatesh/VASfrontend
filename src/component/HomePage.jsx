@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   MDBContainer,
   MDBCard,
@@ -25,10 +26,11 @@ function HomePage() {
   const [profileImage, setProfileImage] = useState(null);
   const [center, setCenter] = useState({ lat: 51.6214, lng: -3.9436 }); // Default to Swansea
   const [mapLoaded, setMapLoaded] = useState(false);
+  const navigate = useNavigate();
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "GOOGLE_MAP_API_KEY",  // Replace with your actual API key
+    googleMapsApiKey: "AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0",  // Replace with your actual API key
   });
 
   useEffect(() => {
@@ -36,8 +38,7 @@ function HomePage() {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          // Redirect to login page if no token
-          return;
+          navigate('/', { replace: true });
         }
 
         const response = await axios.get('http://localhost:8888/api/user', {
@@ -64,20 +65,25 @@ function HomePage() {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
-          setMapLoaded(true); // Indicate that the map can be loaded now
+          setMapLoaded(true); 
         },
         (error) => {
           console.error("Error getting current location:", error);
-          setMapLoaded(true); // Load the map with default center if geolocation fails
+          setMapLoaded(true); 
         }
       );
     } else {
-      setMapLoaded(true); // Load the map with default center if geolocation is not available
+      setMapLoaded(true); 
     }
   }, []);
 
   const handleImageChange = (e) => {
     setProfileImage(e.target.files[0]);
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    navigate('/', { replace: true });
   };
 
   const handleImageUpload = async () => {
@@ -107,7 +113,7 @@ function HomePage() {
       <div className="custom-bg">
         <MDBContainer fluid className="main-content mt-0">
           <MDBRow>
-            <MDBCol md="3" style={{ marginLeft: "10%", color: "whitesmoke", marginTop: "4%", height: "60vh" }}>
+            <MDBCol md="3" style={{ marginLeft: "10%", color: "whitesmoke", marginTop: "4%", height: "68vh" }}>
               <MDBCard className="h-100 mt-5" style={{ backgroundColor: "#fffdd0" }}>
                 <MDBCardBody>
                   <MDBCardTitle>{user ? `${user.firstName} ${user.lastName}` : 'Loading...'}</MDBCardTitle>
@@ -123,7 +129,13 @@ function HomePage() {
                       <MDBListGroupItem
                         key={module}
                         action
-                        onClick={() => setSelectedModule(module)}
+                        onClick={() => {
+                          if (module === 'Sign out') {
+                            handleSignOut(); // Call sign-out function
+                          } else {
+                            setSelectedModule(module);
+                          }
+                        }}
                         active={selectedModule === module}
                       >
                         {module}
