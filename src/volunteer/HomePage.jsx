@@ -30,7 +30,7 @@ function HomePage() {
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "SECRET_KEY",  // Replace with your actual API key
+    googleMapsApiKey: "AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0",  // Replace with your actual API key
   });
 
   useEffect(() => {
