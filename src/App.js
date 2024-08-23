@@ -1,7 +1,8 @@
 import React from 'react';
-import Login from './component/Login';
-import Signup from './component/Signup';
-import HomePage from './component/HomePage';
+import Login from './volunteer/Login';
+import Signup from './volunteer/Signup';
+import HomePage from './volunteer/HomePage';
+import Security from './volunteer/Security';
 import CustomerDashboard from './component/CustomerDashboard';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
@@ -32,17 +33,17 @@ function App() {
           <Route
             path="/home"
             element={
-              <security>
+              <Security>
                 <HomePage />
-              </security>
+              </Security>
             }
           />
           <Route
             path="/customerPage"
             element={
-              <security>
+              <Security>
                 <CustomerDashboard />
-              </security>
+              </Security>
             }
           />
         </Routes>
