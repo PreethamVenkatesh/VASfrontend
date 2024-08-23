@@ -6,6 +6,7 @@ import {
   MDBInput
 } from 'mdb-react-ui-kit';
 import { useNavigate } from 'react-router-dom';
+import {jwtDecode} from "jwt-decode"
 
 function Login() {
   const [loginType, setLoginType] = useState(null);
@@ -51,7 +52,15 @@ function Login() {
         if (loginType === 'volunteer') {
           navigate('/home'); // Navigate to HomePage for volunteers
         } else {
-          navigate('/customerPage'); // Navigate to Customer Page for service requesters
+          const token = localStorage.getItem('token')
+          if(token) {
+            const decoded = jwtDecode(token)
+            console.log(decoded)
+            const decodedEmail = decoded.emailId
+            localStorage.setItem('emailId',decodedEmail)
+            console.log(decodedEmail)
+            navigate('/customerPage'); // Navigate to Customer Page for service requesters
+            }
         }
       } else {
         console.log(data.msg);

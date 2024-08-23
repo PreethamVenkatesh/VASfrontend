@@ -22,11 +22,11 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/custregister" element={<SignUpRequester />} />
-          <Route path='/pastAssist' element={PastAssist} />
-          <Route path='/requestAssist' element={RequestAssist} />
+          <Route path='/pastAssist' element={<PastAssist />} />
+          <Route path='/requestAssist' element={<RequestAssist />} />
           <Route path='/currentAssist' element={CurrentAssist} />
           <Route path='/futureAssist' element={FutureAssist} />
-          <Route path='/account' element={CustomerAccount} />
+          <Route path='/account' element={<CustomerAccount />} />
           <Route path='/help' element={Help} />
           <Route path='/faqs' element={FAQ} />
           <Route
