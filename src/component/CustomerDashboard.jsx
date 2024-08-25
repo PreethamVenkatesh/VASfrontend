@@ -91,8 +91,8 @@ function CustomerDashboard() {
                 style={{ 
                   cursor: 'pointer', 
                   width: '100%', 
-                  maxWidth: '150px', 
-                  height: '150px', 
+                  maxWidth: '120px', 
+                  height: '100px', 
                   marginBottom: '8px' 
                 }} 
               />
@@ -108,8 +108,8 @@ function CustomerDashboard() {
                 style={{ 
                   cursor: 'pointer', 
                   width: '100%', 
-                  maxWidth: '150px', 
-                  height: '150px', 
+                  maxWidth: '120px', 
+                  height: '100px', 
                   marginBottom: '8px' 
                 }} 
               />
