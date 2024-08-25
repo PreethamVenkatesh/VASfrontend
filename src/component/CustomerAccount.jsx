@@ -11,6 +11,9 @@ import Col from 'react-bootstrap/Col';
 import { Form } from 'react-bootstrap';
 import { jwtDecode } from 'jwt-decode'
 import { faEditing, faCog } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
+import CustHome from './Modals/CustHome';
+import CustWork from './Modals/CustWork';
 
 function CustomerAccount() {
   const token = localStorage.getItem('token');
@@ -52,10 +55,13 @@ function CustomerAccount() {
     }
   };
 
+const navigate  = useNavigate();
+
   const handleSignOut = () => {
     // Handle sign out logic
-    localStorage.removeItem('token');
-    window.location.href = '/login'; // Redirect to login page
+    localStorage.clear();
+    // window.location.href = '/login'; // Redirect to login page
+  navigate('/')
   };
 
   const fetchUserDetails = () => {
@@ -78,6 +84,12 @@ function CustomerAccount() {
         });
     }
   };
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
 
   useEffect(() => {
     fetchUserDetails();
@@ -224,14 +236,8 @@ function CustomerAccount() {
                   <b>Settings</b>
                 </Card.Title>
               </div>
-              <Button variant="secondary" style={{ marginBottom: '10px' }}>
-                Add Home
-              </Button>
-              <br />
-              <Button variant="secondary" style={{ marginBottom: '10px' }}>
-                Add Work
-              </Button>
-              <br />
+              <CustHome />
+              <CustWork />
               <Button variant="danger" onClick={handleSignOut}>
                 Sign Out
               </Button>
