@@ -42,8 +42,30 @@ function CustomerAccount() {
       ...prevEditMode,
       [field]: !prevEditMode[field],
     }));
+  
+    // Only make the API call if the field is being toggled off (i.e., when the user has finished editing)
+    if (editMode[field]) {
+      const updatedUser = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        emailId: userData.emailId,
+        phoneNumber: userData.phoneNumber,
+      };
+  
+      const decoded = jwtDecode(token);
+      const decodedEmail = decoded.emailId;
+  
+      axios
+        .put(`http://localhost:8888/api/custupdate`, { emailId: decodedEmail, ...updatedUser })
+        .then((res) => {
+          console.log('User updated successfully:', res.data);
+        })
+        .catch((error) => {
+          console.error('Error updating user:', error);
+        });
+    }
   };
-
+  
   const handleProfilePicChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -84,12 +106,6 @@ const navigate  = useNavigate();
         });
     }
   };
-
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
 
   useEffect(() => {
     fetchUserDetails();
