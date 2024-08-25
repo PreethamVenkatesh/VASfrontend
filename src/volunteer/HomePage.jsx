@@ -1,31 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  MDBContainer,
-  MDBCard,
-  MDBCardBody,
-  MDBCardTitle,
-  MDBCol,
-  MDBRow,
-  MDBListGroup,
-  MDBListGroupItem,
-  MDBFooter,
-  MDBBtn,
-  MDBTable,
-  MDBTableHead,
-  MDBTableBody
-} from 'mdb-react-ui-kit';
+import { MDBContainer, MDBCard, MDBCardBody, MDBCardTitle, MDBCol, MDBRow, MDBListGroup,
+  MDBListGroupItem, MDBFooter, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBInput } from 'mdb-react-ui-kit';
 import axios from 'axios';
-import {
-  GoogleMap,
-  Marker,
-  DirectionsRenderer
-} from "@react-google-maps/api";
-import useGoogleMaps from './GoogleMaps'; // Import the custom hook
-import Modal from 'react-modal'; // Import react-modal
+import { GoogleMap, Marker, DirectionsRenderer } from "@react-google-maps/api";
+import useGoogleMaps from './GoogleMaps';
+import Modal from 'react-modal'; 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "./Style.css";
 
-// Set the app element for accessibility
 Modal.setAppElement('#root');
 
 function HomePage() {
@@ -39,6 +23,11 @@ function HomePage() {
   const [destination, setDestination] = useState(null);
   const [locations, setLocations] = useState([]);
   const navigate = useNavigate();
+  const [editableUser, setEditableUser] = useState({
+    firstName: '',
+    lastName: '',
+    emailId: '',
+  });
 
   const { isLoaded, loadError } = useGoogleMaps(); // Use the custom hook
 
@@ -49,23 +38,27 @@ function HomePage() {
         if (!token) {
           navigate('/', { replace: true });
         }
-
         const response = await axios.get('http://localhost:8888/api/user', {
           headers: {
             'Authorization': token
           }
         });
-
         const relativePath = response.data.profilePicture;
         setUser(response.data);
         setProfileImage(relativePath);
+
+        setEditableUser({
+          firstName: response.data.firstName,
+          lastName: response.data.lastName,
+          emailId: response.data.emailId,
+        });
+
         const locationsResponse = await axios.get(`http://localhost:8888/locations/${response.data.firstName}`);
         setLocations(locationsResponse.data);
       } catch (error) {
         console.error('Error fetching user details:', error);
       }
     };
-
     fetchUserDetails();
 
     // Get current location
@@ -87,6 +80,40 @@ function HomePage() {
       setMapLoaded(true); 
     }
   }, []);
+
+  const handleUpdateProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const { firstName, lastName, emailId} = editableUser;
+      
+      const dataToSend = {
+        firstName,
+        lastName,
+        emailId,
+      };
+    
+      const response = await axios.put('http://localhost:8888/api/update-profile', dataToSend, {
+        headers: {
+          'Authorization': token
+        }
+      });
+  
+      setUser(response.data.user);
+      toast.success('Profile updated successfully');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Failed to update profile: ' + (error.response ? error.response.data.msg : error.message));
+    }
+  };
+  
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditableUser((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
 
   const handleImageChange = (e) => {
     setProfileImage(e.target.files[0]);
@@ -162,7 +189,7 @@ function HomePage() {
                     />
                   </div>
                   <MDBListGroup flush>
-                    {['Upcoming Rides', 'Profile', 'History', 'Current Location', 'Terms & Consent', 'FAQs', 'Sign out'].map((module) => (
+                    {['Upcoming Rides', 'Profile', 'History', 'Current Location', 'Update Profile', 'FAQs', 'Sign out'].map((module) => (
                       <MDBListGroupItem
                         key={module}
                         action
@@ -201,6 +228,7 @@ function HomePage() {
             {selectedModule === 'Upcoming Rides' && (
               <MDBCol md="8" style={{ marginLeft: "10%", marginTop: "5%", height: "35vh", width: "50%" }}>
                 <MDBCard className="h-100 mt-4" style={{ backgroundColor: "#fffdd0" }}>
+                
                   <MDBCardBody>
                     <MDBCardTitle>Upcoming Rides</MDBCardTitle>
                     <MDBTable striped>
@@ -225,6 +253,48 @@ function HomePage() {
                 </MDBCard>
               </MDBCol>
             )}
+
+            {selectedModule === 'Update Profile' && (
+              <MDBCol md="8" style={{ marginLeft: "10%", marginTop: "5%", height: "75vh", width: "50%" }}>
+                <MDBCard className="h-100 mt-4" style={{ backgroundColor: "#fffdd0" }}>
+                <MDBCardBody>
+                    <MDBCardTitle>Update Profile</MDBCardTitle>
+                    <div className="text-center mt-5">
+                      <form>
+                        <div className="input-wrapper mb-4" style={{ marginLeft: "10%", width: "80%", display: "flex", alignItems: "center" }}>
+                          <label htmlFor="firstName" className="form-label" style={{ fontSize: "20px", fontWeight: "bold", marginRight: "2%" }}>
+                            First Name
+                          </label>
+                          <MDBInput
+                            id="firstName" name="firstName" type="text" size="lg" className="flex-grow-1" style={{marginLeft: '30%'}} value={editableUser.firstName} onChange={handleInputChange} required
+                          />
+                        </div>
+                        <div className="input-wrapper mb-4" style={{ marginLeft: "10%", width: "80%", display: "flex", alignItems: "center" }}>
+                          <label htmlFor="lastName" className="form-label" style={{ fontSize: "20px", fontWeight: "bold", marginRight: "2%" }}>
+                            Last Name
+                          </label>
+                          <MDBInput
+                            id="lastName" name="lastName" type="text" size="lg" className="flex-grow-1" style={{marginLeft: '30%'}} value={editableUser.lastName} onChange={handleInputChange} required
+                          />
+                        </div>
+                        <div className="input-wrapper mb-4" style={{ marginLeft: "10%", width: "80%", display: "flex", alignItems: "center" }}>
+                          <label htmlFor="emailId" className="form-label" style={{ fontSize: "20px", fontWeight: "bold", marginRight: "2%" }}>
+                            Email Id
+                          </label>
+                          <MDBInput
+                            id="emailId" name="emailId" type="text" size="lg" className="flex-grow-1" style={{marginLeft: '40%'}} value={editableUser.emailId} onChange={handleInputChange} required
+                          />
+                        </div>
+                        <MDBBtn color="dark" onClick={(e) => {e.preventDefault(); handleUpdateProfile();}} style={{ marginTop: "2%" }}>
+                          Update Profile
+                        </MDBBtn>
+                      </form>
+                    </div>
+                  </MDBCardBody>
+
+                </MDBCard>
+              </MDBCol>
+            )}  
 
             {selectedModule === 'Current Location' && isLoaded && mapLoaded && (
               <MDBCol md="8" style={{ marginLeft: "4%", marginTop: "5%", height: "80vh", width: "60%" }}>
@@ -270,12 +340,20 @@ function HomePage() {
         style={{
           overlay: {
             backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            zIndex: 1000,
           },
           content: {
-            color: 'lightsteelblue',
-            backgroundColor: '#fffdd0',
-            borderRadius: '10px',
-            padding: '20px',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          color: 'lightsteelblue',
+          backgroundColor: '#fffdd0',
+          borderRadius: '10px',
+          padding: '20px',
+          width: '80%', 
+          height: '80%', 
+          zIndex: 1100,
           },
         }}
       >
@@ -283,7 +361,7 @@ function HomePage() {
         <button onClick={() => setModalOpen(false)} style={{ float: 'right', background: 'transparent', border: 'none', fontSize: '1.5rem' }}>&times;</button>
         {isLoaded && directionsResponse && (
           <GoogleMap
-            mapContainerStyle={{ width: "100%", height: "600px" }}
+            mapContainerStyle={{ width: "100%", height: "550px" }}
             center={center}
             zoom={12}
             options={{
@@ -297,6 +375,7 @@ function HomePage() {
           </GoogleMap>
         )}
       </Modal>
+      <ToastContainer/>
     </>
   );
 }
