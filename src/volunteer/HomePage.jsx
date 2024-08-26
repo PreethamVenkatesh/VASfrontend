@@ -105,6 +105,22 @@ function HomePage() {
       toast.error('Failed to update profile: ' + (error.response ? error.response.data.msg : error.message));
     }
   };
+
+  const fetchUpcomingRides = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:8888/api/user', {
+        headers: {
+          'Authorization': token
+        }
+      });
+  
+      const locationsResponse = await axios.get(`http://localhost:8888/locations/${response.data.firstName}`);
+      setLocations(locationsResponse.data);
+    } catch (error) {
+      console.error('Error fetching upcoming rides:', error);
+    }
+  };
   
   
   const handleInputChange = (e) => {
@@ -189,13 +205,16 @@ function HomePage() {
                     />
                   </div>
                   <MDBListGroup flush>
-                    {['Upcoming Rides', 'Profile', 'History', 'Current Location', 'Update Profile', 'FAQs', 'Sign out'].map((module) => (
+                    {['Upcoming Rides', 'Profile Picture', 'History', 'Current Location', 'Update Profile', 'FAQs', 'Sign out'].map((module) => (
                       <MDBListGroupItem
                         key={module}
                         action
                         onClick={() => {
                           if (module === 'Sign out') {
                             handleSignOut(); // Call sign-out function
+                          } else if (module === 'Upcoming Rides') {
+                            fetchUpcomingRides(); // Fetch latest upcoming rides from the database
+                            setSelectedModule(module);
                           } else {
                             setSelectedModule(module);
                           }
@@ -210,16 +229,16 @@ function HomePage() {
               </MDBCard>
             </MDBCol>
 
-            {selectedModule === 'Profile' && (
+            {selectedModule === 'Profile Picture' && (
               <MDBCol md="8" style={{ marginLeft: "10%", marginTop: "5%", height: "35vh", width: "50%" }}>
                 <MDBCard className="h-100 mt-4" style={{ backgroundColor: "#fffdd0" }}>
                   <MDBCardBody>
-                    <MDBCardTitle>Profile</MDBCardTitle>
+                    <MDBCardTitle>Profile Picture</MDBCardTitle>
                     <div className="form-group mb-3">
-                      <label>Choose a Profile Picture</label>
+                      <label style={{marginBottom: "3%", marginTop: "2%"}}>Choose a Profile Picture</label>
                       <input type="file" className="form-control" onChange={handleImageChange} />
                     </div>
-                    <MDBBtn color="dark" onClick={handleImageUpload}>Upload Picture</MDBBtn>
+                    <MDBBtn color="dark" style={{marginTop: "2%"}} onClick={handleImageUpload}>Upload Picture</MDBBtn>
                   </MDBCardBody>
                 </MDBCard>
               </MDBCol>
