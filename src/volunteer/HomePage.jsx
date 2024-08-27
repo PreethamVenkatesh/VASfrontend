@@ -235,12 +235,19 @@ function HomePage() {
           }
         }
       );
-      if (response.data.motStatus === 'Valid') {
-        toast.success('Vehicle status verification successful');
-        setVerificationSuccess(true);
+      if (response.status === 200) {
+        const { user, vehicleData } = response.data;
+        if (vehicleData.motStatus === 'Valid') {
+          toast.success('Vehicle status verification successful');
+          setVerificationSuccess(true);
+        } else {
+          toast.error('Vehicle MOT status is not valid.');
+          setVerificationSuccess(false);
+        }
+        console.log('User Data:', user);
+        console.log('Vehicle Data:', vehicleData);
       } else {
-        toast.error('Vehicle MOT status is not valid.');
-        setVerificationSuccess(false);
+        toast.error('Unexpected response status: ' + response.status);
       }
     } catch (error) {
       console.error('Error verifying vehicle:', error);
@@ -249,16 +256,15 @@ function HomePage() {
   };
 
   const getStatusIndicator = () => {
-    if (verificationSuccess === null) return null; // Not verified yet
+    if (user === null) return null;
     return (
       <div className="d-flex align-items-center" style={{ marginLeft: '70%' }}>
-        <span className="status-text" style={{ marginRight: '10%' }}>
-          {verificationSuccess ? 'Active' : 'Inactive'}
+        <span className="status-text" style={{ marginRight: '10%', marginBottom: '3%' }}>
+          {user.status ? 'Active' : 'Inactive'}
         </span>
         <div 
-          className="status-indicator" 
-          style={{ backgroundColor: verificationSuccess ? 'green' : 'grey' }}
-        ></div>
+          className="status-indicator" style={{ backgroundColor: user.status ? 'green' : 'grey', marginLeft: '20%' }}
+        />
       </div>
     );
   };
@@ -279,10 +285,6 @@ function HomePage() {
                       className="profile-img"
                     />
                   </div>
-                  {/* <div className="d-flex align-items-center" style={{marginLeft: '75%'}}>
-                    <span className="status-text" style={{marginRight: '10%'}}>Active</span>
-                    <div className="status-indicator"></div>
-                  </div> */}
                   {getStatusIndicator()}
                   <MDBListGroup flush>
                     {['Upcoming Rides', 'Profile Picture', 'History', 'Current Location', 'Update Profile', 'Verify Vehicle', 'Sign out'].map((module) => (
@@ -291,9 +293,9 @@ function HomePage() {
                         action
                         onClick={() => {
                           if (module === 'Sign out') {
-                            handleSignOut(); // Call sign-out function
+                            handleSignOut(); 
                           } else if (module === 'Upcoming Rides') {
-                            fetchUpcomingRides(); // Fetch latest upcoming rides from the database
+                            fetchUpcomingRides(); 
                             setSelectedModule(module);
                           } else if (module === 'Verify Vehicle') {
                             setVerifyVehicle(true);

@@ -24,13 +24,19 @@
   }
 
   .status-indicator {
-    bottom: 0;
-    right: 0;
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background-color: green; 
     border: 2px solid white;
+    position: absolute;
+  }
+  
+  .status-indicator.active {
+    background-color: green;
+  }
+  
+  .status-indicator.inactive {
+    background-color: grey;
   }
   
   .status-text {

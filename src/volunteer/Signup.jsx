@@ -18,8 +18,6 @@ function Signup() {
     lastName: '',
     emailId: '',
     password: '',
-    vehicleNumber: '',
-    brpNumber: '',
     volunteer: signupType === 'volunteer'
   });
 
@@ -72,15 +70,7 @@ function Signup() {
                 <div className="input-wrapper mb-4" style={{ display: "flex", justifyContent: "space-between" }}>
                   <label style={{marginTop: '1%', fontSize: "140%"}} htmlFor="emailId" className="form-label">Email address</label>
                   <MDBInput id="emailId" type="email" size="lg" className="flex-grow-1" value={formData.emailId} onChange={handleInputChange} required />
-                </div>
-  
-                {signupType === 'volunteer' && (
-                  <div className="input-wrapper mb-4" style={{ display: "flex", justifyContent: "space-between" }}>
-                    <label style={{marginTop: '1%', fontSize: "140%"}} htmlFor="vehicleNumber" className="form-label">Vehicle No.</label>
-                    <MDBInput id="vehicleNumber" type="text" size="lg" className="flex-grow-1" value={formData.vehicleNumber} onChange={handleInputChange} required />
-                  </div>
-                )}
-  
+                </div>  
                 <div className="input-wrapper mb-4" style={{ display: "flex", justifyContent: "space-between" }}>
                   <label style={{marginTop: '1%', fontSize: "140%"}} htmlFor="password" className="form-label">Password</label>
                   <MDBInput id="password" type="password" size="lg" className="flex-grow-1" value={formData.password} onChange={handleInputChange} required />
