@@ -55,7 +55,6 @@ function HomePage() {
           lastName: response.data.lastName,
           emailId: response.data.emailId,
         });
-
         const locationsResponse = await axios.get(`http://localhost:8888/locations/${response.data.firstName}`);
         setLocations(locationsResponse.data);
       } catch (error) {
@@ -63,8 +62,6 @@ function HomePage() {
       }
     };
     fetchUserDetails();
-
-    // Get current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -88,19 +85,16 @@ function HomePage() {
     try {
       const token = localStorage.getItem('token');
       const { firstName, lastName, emailId} = editableUser;
-      
       const dataToSend = {
         firstName,
         lastName,
         emailId,
       };
-    
       const response = await axios.put('http://localhost:8888/api/update-profile', dataToSend, {
         headers: {
           'Authorization': token
         }
       });
-  
       setUser(response.data.user);
       toast.success('Profile updated successfully');
     } catch (error) {
@@ -117,14 +111,12 @@ function HomePage() {
           'Authorization': token
         }
       });
-  
       const locationsResponse = await axios.get(`http://localhost:8888/locations/${response.data.firstName}`);
       setLocations(locationsResponse.data);
     } catch (error) {
       console.error('Error fetching upcoming rides:', error);
     }
   };
-  
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -146,7 +138,6 @@ function HomePage() {
   const handleImageUpload = async () => {
     const formData = new FormData();
     formData.append('profilePicture', profileImage);
-
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post('http://localhost:8888/api/upload-profile-picture', formData, {
@@ -155,7 +146,6 @@ function HomePage() {
           'Authorization': token
         }
       });
-
       const relativePath = response.data.profilePicturePath;
       setProfileImage(relativePath);
       alert('Profile picture uploaded successfully');
@@ -168,8 +158,6 @@ function HomePage() {
   const handleStartClick = async (location) => {
     try {
       const directionsService = new window.google.maps.DirectionsService();
-  
-      // Request directions from the current location to the customer's location (A to B)
       const directionsRequestToCustomer = {
         origin: center,
         destination: {
@@ -178,8 +166,6 @@ function HomePage() {
         },
         travelMode: window.google.maps.TravelMode.DRIVING,
       };
-  
-      // Request directions from the customer's location to the destination (B to C)
       const directionsRequestToDestination = {
         origin: {
           lat: location.custLocationLat,
@@ -191,8 +177,6 @@ function HomePage() {
         },
         travelMode: window.google.maps.TravelMode.DRIVING,
       };
-  
-      // Fetch both directions simultaneously
       const [directionsToCustomer, directionsToDestination] = await Promise.all([
         new Promise((resolve, reject) => {
           directionsService.route(directionsRequestToCustomer, (result, status) => {
@@ -213,8 +197,6 @@ function HomePage() {
           });
         }),
       ]);
-  
-      // Save the directions responses for rendering
       setDirectionsResponse([directionsToCustomer, directionsToDestination]);
       setDestination(location);
       setModalOpen(true);
@@ -395,7 +377,6 @@ function HomePage() {
                       </form>
                     </div>
                   </MDBCardBody>
-
                 </MDBCard>
               </MDBCol>
             )}  
@@ -421,7 +402,6 @@ function HomePage() {
                       </MDBCard>
                     </MDBCol>
                   )}
-
 
             {selectedModule === 'Current Location' && isLoaded && mapLoaded && (
               <MDBCol md="8" style={{ marginLeft: "4%", marginTop: "5%", height: "80vh", width: "60%" }}>
@@ -500,7 +480,6 @@ function HomePage() {
                 fullscreenControl: false,
               }}
             >
-              {/* A to B: Blue route */}
               <DirectionsRenderer 
                 directions={directionsResponse[0]} 
                 options={{
@@ -512,19 +491,14 @@ function HomePage() {
                   suppressMarkers: true,
                 }} 
               />
-
               <Marker 
                   position={directionsResponse[0].routes[0].legs[0].start_location} 
                   label="A" 
                 />
-
-                {/* Custom Marker for point B */}
                 <Marker 
                   position={directionsResponse[0].routes[0].legs[0].end_location} 
                   label="B" 
                 />
-
-              {/* B to C: Green route */}
               <DirectionsRenderer 
                 directions={directionsResponse[1]} 
                 options={{
@@ -536,7 +510,6 @@ function HomePage() {
                   suppressMarkers: true,
                 }} 
               />
-
               <Marker 
                   position={directionsResponse[1].routes[0].legs[0].end_location} 
                   label="C" 
