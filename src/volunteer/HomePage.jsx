@@ -20,8 +20,11 @@ function HomePage() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [directionsResponse, setDirectionsResponse] = useState(null);
-  const [destination, setDestination] = useState(null);
+  const [setDestination] = useState(null);
   const [locations, setLocations] = useState([]);
+  const [verifyVehicle, setVerifyVehicle] = useState(false);
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
+  const [vehicleNumber, setVehicleNumber] = useState('');
   const navigate = useNavigate();
   const [editableUser, setEditableUser] = useState({
     firstName: '',
@@ -29,7 +32,7 @@ function HomePage() {
     emailId: '',
   });
 
-  const { isLoaded, loadError } = useGoogleMaps(); // Use the custom hook
+  const { isLoaded } = useGoogleMaps(); // Use the custom hook
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -165,35 +168,107 @@ function HomePage() {
   const handleStartClick = async (location) => {
     try {
       const directionsService = new window.google.maps.DirectionsService();
-      const directionsRequest = {
+  
+      // Request directions from the current location to the customer's location (A to B)
+      const directionsRequestToCustomer = {
         origin: center,
         destination: {
-          lat: location.latitude,
-          lng: location.longitude
+          lat: location.custLocationLat,
+          lng: location.custLocationLong
         },
-        travelMode: window.google.maps.TravelMode.DRIVING
+        travelMode: window.google.maps.TravelMode.DRIVING,
       };
-
-      directionsService.route(directionsRequest, (result, status) => {
-        if (status === window.google.maps.DirectionsStatus.OK) {
-          setDirectionsResponse(result);
-          setDestination(location);
-          setModalOpen(true);
-        } else {
-          console.error('Directions request failed due to ' + status);
-        }
-      });
+  
+      // Request directions from the customer's location to the destination (B to C)
+      const directionsRequestToDestination = {
+        origin: {
+          lat: location.custLocationLat,
+          lng: location.custLocationLong,
+        },
+        destination: {
+          lat: location.destinationLat,
+          lng: location.destinationLong,
+        },
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      };
+  
+      // Fetch both directions simultaneously
+      const [directionsToCustomer, directionsToDestination] = await Promise.all([
+        new Promise((resolve, reject) => {
+          directionsService.route(directionsRequestToCustomer, (result, status) => {
+            if (status === window.google.maps.DirectionsStatus.OK) {
+              resolve(result);
+            } else {
+              reject(`Failed to get directions to customer: ${status}`);
+            }
+          });
+        }),
+        new Promise((resolve, reject) => {
+          directionsService.route(directionsRequestToDestination, (result, status) => {
+            if (status === window.google.maps.DirectionsStatus.OK) {
+              resolve(result);
+            } else {
+              reject(`Failed to get directions to destination: ${status}`);
+            }
+          });
+        }),
+      ]);
+  
+      // Save the directions responses for rendering
+      setDirectionsResponse([directionsToCustomer, directionsToDestination]);
+      setDestination(location);
+      setModalOpen(true);
     } catch (error) {
       console.error('Error fetching directions:', error);
     }
   };
 
+  const handleVerifyVehicle = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://localhost:8888/api/verify-vehicle', 
+        { registrationNumber: vehicleNumber }, 
+        {
+          headers: {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      if (response.data.motStatus === 'Valid') {
+        toast.success('Vehicle status verification successful');
+        setVerificationSuccess(true);
+      } else {
+        toast.error('Vehicle MOT status is not valid.');
+        setVerificationSuccess(false);
+      }
+    } catch (error) {
+      console.error('Error verifying vehicle:', error);
+      toast.error('Failed to verify vehicle: ' + (error.response ? error.response.data.message : error.message));
+    }
+  };
+
+  const getStatusIndicator = () => {
+    if (verificationSuccess === null) return null; // Not verified yet
+    return (
+      <div className="d-flex align-items-center" style={{ marginLeft: '70%' }}>
+        <span className="status-text" style={{ marginRight: '10%' }}>
+          {verificationSuccess ? 'Active' : 'Inactive'}
+        </span>
+        <div 
+          className="status-indicator" 
+          style={{ backgroundColor: verificationSuccess ? 'green' : 'grey' }}
+        ></div>
+      </div>
+    );
+  };
+  
   return (
     <>
       <div className="custom-bg">
         <MDBContainer fluid className="main-content mt-0">
           <MDBRow>
-            <MDBCol md="3" style={{ marginLeft: "10%", color: "whitesmoke", marginTop: "4%", height: "68vh" }}>
+            <MDBCol md="3" style={{ marginLeft: "10%", color: "whitesmoke", marginTop: "4%", height: "7.5%" }}>
               <MDBCard className="h-100 mt-5" style={{ backgroundColor: "#fffdd0" }}>
                 <MDBCardBody>
                   <MDBCardTitle>{user ? `${user.firstName} ${user.lastName}` : 'Loading...'}</MDBCardTitle>
@@ -204,8 +279,13 @@ function HomePage() {
                       className="profile-img"
                     />
                   </div>
+                  {/* <div className="d-flex align-items-center" style={{marginLeft: '75%'}}>
+                    <span className="status-text" style={{marginRight: '10%'}}>Active</span>
+                    <div className="status-indicator"></div>
+                  </div> */}
+                  {getStatusIndicator()}
                   <MDBListGroup flush>
-                    {['Upcoming Rides', 'Profile Picture', 'History', 'Current Location', 'Update Profile', 'FAQs', 'Sign out'].map((module) => (
+                    {['Upcoming Rides', 'Profile Picture', 'History', 'Current Location', 'Update Profile', 'Verify Vehicle', 'Sign out'].map((module) => (
                       <MDBListGroupItem
                         key={module}
                         action
@@ -214,6 +294,9 @@ function HomePage() {
                             handleSignOut(); // Call sign-out function
                           } else if (module === 'Upcoming Rides') {
                             fetchUpcomingRides(); // Fetch latest upcoming rides from the database
+                            setSelectedModule(module);
+                          } else if (module === 'Verify Vehicle') {
+                            setVerifyVehicle(true);
                             setSelectedModule(module);
                           } else {
                             setSelectedModule(module);
@@ -315,6 +398,29 @@ function HomePage() {
               </MDBCol>
             )}  
 
+            {selectedModule === 'Verify Vehicle' && (
+                    <MDBCol md="8" style={{ marginLeft: "10%", marginTop: "5%", height: "80%", width: "40%" }}>
+                      <MDBCard className="h-100 mt-5" style={{ backgroundColor: "#fffdd0", height: "100%" }}>
+                        <MDBCardBody>
+                          <MDBCardTitle style={{marginTop: '1%', marginBottom: '3%'}}>Verify Vehicle</MDBCardTitle>
+                          <div className="d-flex align-items-center mb-3 mt-2">
+                            <label htmlFor="vehicleNumber" style={{ marginRight: "5%", fontSize: "18px", fontWeight: "bold" }}>Vehicle Number</label>
+                            <MDBInput
+                              id="vehicleNumber"
+                              type="text"
+                              size="lg"
+                              style={{ flex: 1 }}
+                              value={vehicleNumber}
+                              onChange={(e) => setVehicleNumber(e.target.value)}
+                            />
+                          </div>
+                          <MDBBtn color="primary" style={{ marginTop: "2%" }} onClick={handleVerifyVehicle}>Verify</MDBBtn>
+                        </MDBCardBody>
+                      </MDBCard>
+                    </MDBCol>
+                  )}
+
+
             {selectedModule === 'Current Location' && isLoaded && mapLoaded && (
               <MDBCol md="8" style={{ marginLeft: "4%", marginTop: "5%", height: "80vh", width: "60%" }}>
                 <MDBCard className="h-100 mt-4" style={{ backgroundColor: "#fffdd0" }}>
@@ -362,36 +468,79 @@ function HomePage() {
             zIndex: 1000,
           },
           content: {
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          color: 'lightsteelblue',
-          backgroundColor: '#fffdd0',
-          borderRadius: '10px',
-          padding: '20px',
-          width: '80%', 
-          height: '80%', 
-          zIndex: 1100,
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            color: 'lightsteelblue',
+            backgroundColor: '#fffdd0',
+            borderRadius: '10px',
+            padding: '20px',
+            width: '80%',
+            height: '80%',
+            zIndex: 1100,
           },
         }}
       >
-        <h1 style={{color: 'green'}}>Directions to Destination</h1>
         <button onClick={() => setModalOpen(false)} style={{ float: 'right', background: 'transparent', border: 'none', fontSize: '1.5rem' }}>&times;</button>
-        {isLoaded && directionsResponse && (
-          <GoogleMap
-            mapContainerStyle={{ width: "100%", height: "550px" }}
-            center={center}
-            zoom={12}
-            options={{
-              zoomControl: true,
-              streetViewControl: true,
-              mapTypeControl: false,
-              fullscreenControl: false,
-            }}
-          >
-            <DirectionsRenderer directions={directionsResponse} />
-          </GoogleMap>
+        <h1 style={{ color: 'green', marginLeft: '40%' }}>TRAVEL ROUTE</h1>
+        
+        {isLoaded && directionsResponse && directionsResponse.length === 2 && (
+          <>
+            <GoogleMap
+              mapContainerStyle={{ width: "100%", height: "88%", marginTop: '2%' }}
+              center={center}
+              zoom={12}
+              options={{
+                zoomControl: true,
+                streetViewControl: true,
+                mapTypeControl: false,
+                fullscreenControl: false,
+              }}
+            >
+              {/* A to B: Blue route */}
+              <DirectionsRenderer 
+                directions={directionsResponse[0]} 
+                options={{
+                  polylineOptions: {
+                    strokeColor: 'blue',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 5,
+                  },
+                  suppressMarkers: true,
+                }} 
+              />
+
+              <Marker 
+                  position={directionsResponse[0].routes[0].legs[0].start_location} 
+                  label="A" 
+                />
+
+                {/* Custom Marker for point B */}
+                <Marker 
+                  position={directionsResponse[0].routes[0].legs[0].end_location} 
+                  label="B" 
+                />
+
+              {/* B to C: Green route */}
+              <DirectionsRenderer 
+                directions={directionsResponse[1]} 
+                options={{
+                  polylineOptions: {
+                    strokeColor: 'green',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 5,
+                  },
+                  suppressMarkers: true,
+                }} 
+              />
+
+              <Marker 
+                  position={directionsResponse[1].routes[0].legs[0].end_location} 
+                  label="C" 
+                />
+            </GoogleMap>
+          </>
         )}
       </Modal>
       <ToastContainer/>
