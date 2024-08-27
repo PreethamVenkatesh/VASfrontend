@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-  MDBBtn,
-  MDBCardBody,
-  MDBIcon,
-  MDBInput
-} from 'mdb-react-ui-kit';
+import { MDBBtn, MDBCardBody, MDBIcon, MDBInput } from 'mdb-react-ui-kit';
 import { useNavigate } from 'react-router-dom';
 import {jwtDecode} from "jwt-decode"
 
@@ -36,21 +31,17 @@ function Login() {
       const apiUrl = loginType === 'volunteer' 
         ? 'http://localhost:8888/api/login' 
         : 'http://localhost:8888/api/custlogin';
-
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emailId: email, password })
       });
-
       const data = await response.json();
-
       if (response.ok) {
         console.log("Login successful", data.token);
-        localStorage.setItem('token', data.token); // Save token to local storage
-
+        localStorage.setItem('token', data.token);
         if (loginType === 'volunteer') {
-          navigate('/home'); // Navigate to HomePage for volunteers
+          navigate('/home'); 
         } else {
           const token = localStorage.getItem('token')
           if(token) {
@@ -59,7 +50,7 @@ function Login() {
             const decodedEmail = decoded.emailId
             localStorage.setItem('emailId',decodedEmail)
             console.log(decodedEmail)
-            navigate('/customerPage'); // Navigate to Customer Page for service requesters
+            navigate('/customerPage');
             }
         }
       } else {
@@ -77,7 +68,6 @@ function Login() {
           <MDBIcon fas icon="cubes fa-3x me-3" style={{ color: '#ff6219' }} />
           <span className="h1 fw-bold mb-0 mt-5" style={{ fontSize: '3.5rem' }}>VAS LIFT ASSIST</span>
         </div>
-
         {showSignupButtons ? (
           <div className="my-4">
             <MDBBtn className="me-3" color='dark' onClick={() => handleSignupTypeSelect('volunteer')}>

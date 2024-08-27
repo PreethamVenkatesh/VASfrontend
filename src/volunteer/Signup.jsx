@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import {
-  MDBCardBody,
-  MDBIcon,
-  MDBInput,
-  MDBCard
-} from 'mdb-react-ui-kit';
+import { MDBCardBody, MDBIcon, MDBInput, MDBCard } from 'mdb-react-ui-kit';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "./Style.css";
 
 function Signup() {
@@ -33,10 +30,13 @@ function Signup() {
     try {
       const response = await axios.post('http://localhost:8888/api/signup', formData);
       console.log(response.data);
-      navigate('/'); // Navigate to home page after successful registration
+      toast.success('User signed up successfully');
+      setTimeout(() => {
+        navigate('/');
+      }, 3000);
     } catch (error) {
       console.error('Error registering user:', error.response ? error.response.data : error.message);
-      // Optionally, handle error state in your component
+      toast.error('Error in creating user');
     }
   };
 
@@ -55,18 +55,15 @@ function Signup() {
               <div className="text-center mb-4">
                 <h3>Create your account</h3>
               </div>
-  
               <form onSubmit={handleSubmit}>
                 <div className="input-wrapper mb-4" style={{ display: "flex", justifyContent: "space-between" }}>
                   <label style={{marginTop: '1%', fontSize: "140%"}} htmlFor="firstName" className="form-label">First Name</label>
                   <MDBInput id="firstName" type="text" size="lg" className="flex-grow-1" value={formData.firstName} onChange={handleInputChange} required />
                 </div>
-  
                 <div className="input-wrapper mb-4" style={{ display: "flex", justifyContent: "space-between" }}>
                   <label style={{marginTop: '1%', fontSize: "140%"}} htmlFor="lastName" className="form-label">Last Name</label>
                   <MDBInput id="lastName" type="text" size="lg" className="flex-grow-1" value={formData.lastName} onChange={handleInputChange} required />
                 </div>
-  
                 <div className="input-wrapper mb-4" style={{ display: "flex", justifyContent: "space-between" }}>
                   <label style={{marginTop: '1%', fontSize: "140%"}} htmlFor="emailId" className="form-label">Email address</label>
                   <MDBInput id="emailId" type="email" size="lg" className="flex-grow-1" value={formData.emailId} onChange={handleInputChange} required />
@@ -75,24 +72,19 @@ function Signup() {
                   <label style={{marginTop: '1%', fontSize: "140%"}} htmlFor="password" className="form-label">Password</label>
                   <MDBInput id="password" type="password" size="lg" className="flex-grow-1" value={formData.password} onChange={handleInputChange} required />
                 </div>
-  
                 <div className="input-wrapper mb-4" style={{ display: "flex", justifyContent: "space-between" }}>
                   <label style={{marginTop: '1%', fontSize: "140%"}} htmlFor="confirmPassword" className="form-label">Confirm Password</label>
                   <MDBInput id="confirmPassword" type="password" size="lg" className="flex-grow-1" value={formData.confirmPassword} onChange={handleInputChange} required />
                 </div>
-  
-                <Button type="submit" className="text-center mt-4" style={{ fontSize: "25px" }}>
-                  Register
-                </Button>
+                <Button type="submit" className="text-center mt-4" style={{ fontSize: "25px" }}>Register</Button>
               </form>
             </MDBCardBody>
           </MDBCard>
         </div>
       </MDBCardBody>
+      <ToastContainer/>
     </div>
   );
-  
-  
 }
 
 export default Signup;
