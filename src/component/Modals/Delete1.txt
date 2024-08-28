@@ -78,11 +78,11 @@ const RequestAssist = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
-      <h1 style={{ color: 'blue', fontWeight: 'bold', textDecoration: 'underline' }}>Request Assistance</h1>
-      <form style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ marginTop: '8rem', justifyContent: 'center', width: '100%', maxWidth: '600px' }}>
-          <label style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>From</label>
+    <div>
+      <h1>Request Assistance</h1>
+      <form>
+        <div>
+          <label>From (Your Location):</label>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
               <StandaloneSearchBox
@@ -93,7 +93,7 @@ const RequestAssist = () => {
                   type="text"
                   value={fromLocation}
                   onChange={(e) => setFromLocation(e.target.value)}
-                  placeholder="Enter your location"
+                  placeholder="Enter your location or use current location"
                   style={{ width: '100%', padding: '0.5rem', marginRight: '0.5rem' }}
                 />
               </StandaloneSearchBox>
@@ -103,8 +103,8 @@ const RequestAssist = () => {
             </button>
           </div>
         </div>
-        <div style={{ marginBottom: '1rem', width: '100%', maxWidth: '600px' }}>
-          <label style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>Destination</label>
+        <div>
+          <label>Destination (Nearest Hospital):</label>
           <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
             <StandaloneSearchBox
               onLoad={ref => (destinationSearchBoxRef.current = ref)}
@@ -120,12 +120,12 @@ const RequestAssist = () => {
             </StandaloneSearchBox>
           </LoadScript>
         </div>
-        <button type="button" onClick={handleBooking} style={{ padding: '0.5rem', backgroundColor: 'blue', color: 'white' }}>
+        <button type="button" onClick={handleBooking}>
           Book Now
         </button>
       </form>
 
-      {isBookingComplete && <p style={{ color: 'white', fontWeight: 'bold' }}>Booking Completed Successfully!</p>}
+      {isBookingComplete && <p>Booking Completed Successfully!</p>}
       {bookingError && <p style={{ color: 'red' }}>{bookingError}</p>}
     </div>
   );

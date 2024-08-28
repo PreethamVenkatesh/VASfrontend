@@ -1,5 +1,4 @@
-import React, { useState, useRef } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from 'react';
 import { LoadScript, StandaloneSearchBox } from '@react-google-maps/api';
 
 const libraries = ['places'];
@@ -7,11 +6,8 @@ const libraries = ['places'];
 const RequestAssist = () => {
   const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 });
   const [fromLocation, setFromLocation] = useState('');
-  const [fromLatLng, setFromLatLng] = useState({ lat: null, lng: null });
   const [destination, setDestination] = useState('');
-  const [destinationLatLng, setDestinationLatLng] = useState({ lat: null, lng: null });
   const [isBookingComplete, setIsBookingComplete] = useState(false);
-  const [bookingError, setBookingError] = useState('');
   const fromSearchBoxRef = useRef(null);
   const destinationSearchBoxRef = useRef(null);
 
@@ -21,9 +17,9 @@ const RequestAssist = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          const locationString = `Lat: ${latitude}, Lng: ${longitude}`;
           setCurrentLocation({ lat: latitude, lng: longitude });
-          setFromLocation(`Lat: ${latitude}, Lng: ${longitude}`);
-          setFromLatLng({ lat: latitude, lng: longitude });
+          setFromLocation(locationString);
         },
         (error) => {
           console.error("Error getting the user's location", error);
@@ -38,8 +34,6 @@ const RequestAssist = () => {
     if (places && places.length > 0) {
       const place = places[0];
       setFromLocation(place.formatted_address || place.name);
-      const { lat, lng } = place.geometry.location;
-      setFromLatLng({ lat: lat(), lng: lng() });
     }
   };
 
@@ -49,40 +43,21 @@ const RequestAssist = () => {
     if (places && places.length > 0) {
       const place = places[0];
       setDestination(place.formatted_address || place.name);
-      const { lat, lng } = place.geometry.location;
-      setDestinationLatLng({ lat: lat(), lng: lng() });
     }
   };
 
   // Handle the booking
-  const handleBooking = async () => {
-    try {
-      const response = await axios.post('http://localhost:8888/api/userlocation', {
-        custLocationLat: fromLatLng.lat,
-        custLocationLong: fromLatLng.lng,
-        date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
-        time: new Date().toTimeString().split(' ')[0], // Current time in HH:MM:SS format
-        allocatedVolunteer: 'Preetham', // Example value, you might want to change this
-        destinationLat: destinationLatLng.lat,
-        destinationLong: destinationLatLng.lng,
-      });
-
-      if (response.status === 201) {
-        setIsBookingComplete(true);
-        setBookingError('');
-      }
-    } catch (error) {
-      console.error('Error booking the request:', error);
-      setBookingError('Error completing the booking. Please try again.');
-    }
+  const handleBooking = () => {
+    // Perform the booking logic here (e.g., send data to an API)
+    setIsBookingComplete(true);
   };
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
-      <h1 style={{ color: 'blue', fontWeight: 'bold', textDecoration: 'underline' }}>Request Assistance</h1>
-      <form style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ marginTop: '8rem', justifyContent: 'center', width: '100%', maxWidth: '600px' }}>
-          <label style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>From</label>
+    <div>
+      <h1>Request Assistance</h1>
+      <form>
+        <div>
+          <label>From (Your Location):</label>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
               <StandaloneSearchBox
@@ -93,7 +68,7 @@ const RequestAssist = () => {
                   type="text"
                   value={fromLocation}
                   onChange={(e) => setFromLocation(e.target.value)}
-                  placeholder="Enter your location"
+                  placeholder="Enter your location or use current location"
                   style={{ width: '100%', padding: '0.5rem', marginRight: '0.5rem' }}
                 />
               </StandaloneSearchBox>
@@ -103,8 +78,8 @@ const RequestAssist = () => {
             </button>
           </div>
         </div>
-        <div style={{ marginBottom: '1rem', width: '100%', maxWidth: '600px' }}>
-          <label style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>Destination</label>
+        <div>
+          <label>Destination (Nearest Hospital):</label>
           <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
             <StandaloneSearchBox
               onLoad={ref => (destinationSearchBoxRef.current = ref)}
@@ -120,13 +95,12 @@ const RequestAssist = () => {
             </StandaloneSearchBox>
           </LoadScript>
         </div>
-        <button type="button" onClick={handleBooking} style={{ padding: '0.5rem', backgroundColor: 'blue', color: 'white' }}>
+        <button type="button" onClick={handleBooking}>
           Book Now
         </button>
       </form>
 
-      {isBookingComplete && <p style={{ color: 'white', fontWeight: 'bold' }}>Booking Completed Successfully!</p>}
-      {bookingError && <p style={{ color: 'red' }}>{bookingError}</p>}
+      {isBookingComplete && <p>Booking Completed Successfully!</p>}
     </div>
   );
 };
