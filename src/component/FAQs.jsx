@@ -77,13 +77,13 @@ function FAQs() {
   ];
 
   const toggleFAQ = (index) => {
-    setOpenIndex(openIndex === index ? null : index); // Toggle between opening and closing
+    setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#f8f8f8' }}>
       <h1 style={{ color: 'blue', fontWeight: 'bold', textDecoration: 'underline' }}>FAQs</h1>
-      <div style={{ maxWidth: '800px', margin: 'auto' }}>
+      <div style={{ maxWidth: '800px', margin: 'auto' , fontSize: '25px'}}>
         {faqs.map((faq, index) => (
           <div
             key={index}

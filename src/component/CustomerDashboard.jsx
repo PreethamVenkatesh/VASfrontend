@@ -9,11 +9,10 @@ import HelpImage from '../images/Help.jpeg';
 import FaqsImage from '../images/FAQs.jpeg';  
 import AccountImage from '../images/UserAccount.jpeg' 
 import { NavLink } from 'react-router-dom';
-import './CD.css';
 
 function CustomerDashboard() {
   return (
-    <div className='abc'>
+    <div style={{ backgroundColor: 'yellow', minHeight: '100vh' }}>
       <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
         <NavLink to={'/account'} style={{ textDecoration: 'none' }}>
           <img 
@@ -71,7 +70,7 @@ function CustomerDashboard() {
                 }} 
               />
               <br />
-              <span style={{ color: 'yellow' }}>Past Assist</span>
+              <span style={{ color: 'red' }}>Past Assist</span>
             </NavLink>
           </Col>
 
@@ -138,7 +137,7 @@ function CustomerDashboard() {
                 }} 
               />
               <br />
-              <span style={{ color: 'yellow' }}>Book Future Assistance</span>
+              <span style={{ color: 'red' }}>Book Future Assistance</span>
             </NavLink>
           </Col>
         </Row>
@@ -159,7 +158,7 @@ function CustomerDashboard() {
                   alt='Help'
                   style={{ width: '100%', maxWidth: '120px', height: 'auto', marginBottom: '8px' }}
                 />
-                <span style={{ color: 'yellow', fontWeight: 'bolder' }}>Help</span>
+                <span style={{ color: 'red', fontWeight: 'bolder' }}>Help</span>
               </NavLink>
             </div>
           </Col>
@@ -171,7 +170,7 @@ function CustomerDashboard() {
                   alt='FAQs'
                   style={{ width: '100%', maxWidth: '120px', height: 'auto', marginBottom: '8px' }}
                 />
-                <span style={{ color: 'yellow', fontWeight: 'bolder' }}>FAQs</span>
+                <span style={{ color: 'red', fontWeight: 'bolder' }}>FAQs</span>
               </NavLink>
             </div>
           </Col> 

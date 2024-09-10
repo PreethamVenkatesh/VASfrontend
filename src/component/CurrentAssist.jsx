@@ -151,12 +151,12 @@ function CurrentAssist() {
 // Updated CSS styling objects
 const containerStyle = {
   display: 'flex',
-  justifyContent: 'center',      // Centers the form horizontally
-  alignItems: 'center',          // Centers the form vertically
-  height: '100vh',               // Takes up the full viewport height
+  justifyContent: 'center',      
+  alignItems: 'center',          
+  height: '100vh',   
   fontFamily: 'Arial, sans-serif',
-  background: 'url(path-to-your-image.jpg) no-repeat center center fixed',
-  backgroundSize: 'cover',       // Ensures the image covers the entire container
+  //backgroundColor: 'white',
+  backgroundSize: 'cover',       
 };
 
 const formContainerStyle = {
@@ -166,7 +166,7 @@ const formContainerStyle = {
   backgroundColor: '#fff',
   padding: '2rem',
   borderRadius: '8px',
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Adds a shadow for a clean look
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', 
   width: '100%',
   maxWidth: '600px',
 };
