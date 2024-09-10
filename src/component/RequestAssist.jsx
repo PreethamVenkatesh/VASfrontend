@@ -55,7 +55,7 @@ const RequestAssist = () => {
   };
 
   // Handle the booking
-  const handleBooking = async () => {
+  const handleBooking = async () => { 
     try {
       const response = await axios.post('http://localhost:8888/api/userlocation', {
         custLocationLat: fromLatLng.lat,
@@ -107,7 +107,7 @@ const RequestAssist = () => {
           <label style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>Destination</label>
           <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
             <StandaloneSearchBox
-              onLoad={ref => (destinationSearchBoxRef.current = ref)}
+               onLoad={ref => (destinationSearchBoxRef.current = ref)}
               onPlacesChanged={handleDestinationPlaceChanged}
             >
               <input

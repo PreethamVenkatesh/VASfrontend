@@ -9,13 +9,11 @@ function FutureAssist() {
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (fromLocation && destination && date && time) {
       try {
-        // Send POST request to the backend
         const response = await axios.post('http://localhost:8888/api/futurelocation', {
           fromLocation,
           destination,
@@ -23,10 +21,9 @@ function FutureAssist() {
           time
         });
 
-        // If the request is successful, display confirmation
         if (response.status === 201) {
           setConfirmationMessage(`Your lift has been scheduled from ${fromLocation} to ${destination} on ${date} at ${time}.`);
-          setErrorMessage('');  // Clear error message
+          setErrorMessage(''); 
           console.log(response)
         }
       } catch (error) {
@@ -104,15 +101,14 @@ function FutureAssist() {
   );
 }
 
-// Styling objects
 const containerStyle = {
-  padding: '2rem',
+  padding: '4rem',
   fontFamily: 'Arial, sans-serif',
   textAlign: 'center',
   backgroundColor: '#f9f9f9',
   borderRadius: '8px',
   maxWidth: '400px',
-  margin: '2rem auto',
+  margin: 'auto',
 };
 
 const headerStyle = {
