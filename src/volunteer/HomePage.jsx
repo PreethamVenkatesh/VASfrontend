@@ -20,18 +20,18 @@ function HomePage() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [directionsResponse, setDirectionsResponse] = useState(null);
-  const [setDestination] = useState(null);
+  const [destination, setDestination] = useState(null);
   const [locations, setLocations] = useState([]);
   const [verifyVehicle, setVerifyVehicle] = useState(false);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
   const [vehicleNumber, setVehicleNumber] = useState('');
+  const [availabilityStatus, setAvailabilityStatus] = useState('Unavailable');
   const navigate = useNavigate();
   const [editableUser, setEditableUser] = useState({
     firstName: '',
     lastName: '',
     emailId: '',
   });
-
   const { isLoaded } = useGoogleMaps(); // Use the custom hook
 
   useEffect(() => {
@@ -62,6 +62,37 @@ function HomePage() {
       }
     };
     fetchUserDetails();
+    const startTracking = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            setCenter({ lat: latitude, lng: longitude });
+            try {
+              const token = localStorage.getItem('token');
+              await axios.post('http://localhost:8888/api/update-location', 
+                { latitude, longitude }, 
+                { headers: { 'Authorization': token } }
+              );
+            } catch (error) {
+              console.error('Error updating location:', error);
+            }
+          },
+          (error) => {
+            console.error("Error getting current location:", error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0,
+          }
+        );
+      } else {
+        console.error('Geolocation is not supported by this browser.');
+      }
+    };
+  
+    startTracking();
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -79,7 +110,32 @@ function HomePage() {
     } else {
       setMapLoaded(true); 
     }
-  }, []);
+  }, [navigate]);
+
+  const AvailabilityToggle = async (status) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+  
+      const availability = status === 'Available'; 
+      const response = await axios.post('http://localhost:8888/api/update-availability', 
+        { availability },
+        { headers: { 'Authorization': token } }
+      );
+  
+      if (response.status === 200) {
+        console.log(response.data.msg);
+        setAvailabilityStatus(status);
+      } else {
+        console.error('Failed to update availability:', response.data.msg); 
+      }
+    } catch (error) {
+      console.error('Error updating availability:', error);
+    }
+  };
 
   const handleUpdateProfile = async () => {
     try {
@@ -128,6 +184,10 @@ function HomePage() {
 
   const handleImageChange = (e) => {
     setProfileImage(e.target.files[0]);
+  };
+
+  const handleAvailabilityToggle = (status) => {
+    setAvailabilityStatus(status); 
   };
 
   const handleSignOut = () => {
@@ -198,6 +258,7 @@ function HomePage() {
         }),
       ]);
       setDirectionsResponse([directionsToCustomer, directionsToDestination]);
+      console.log(location)
       setDestination(location);
       setModalOpen(true);
     } catch (error) {
@@ -250,12 +311,57 @@ function HomePage() {
       </div>
     );
   };
+
+  const handleStartNavigation = () => {
+    if (directionsResponse && directionsResponse.length > 0) {
+      const startLat = directionsResponse[0].routes[0].legs[0].start_location.lat();
+      const startLng = directionsResponse[0].routes[0].legs[0].start_location.lng();
+      const destLat = directionsResponse[0].routes[0].legs[0].end_location.lat();
+      const destLng = directionsResponse[0].routes[0].legs[0].end_location.lng();
+  
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${destLat},${destLng}&travelmode=driving`;
+      window.open(googleMapsUrl, '_blank');
+    } else {
+      toast.error("No directions available");
+    }
+  };
   
   return (
     <>
       <div className="custom-bg">
         <MDBContainer fluid className="main-content mt-0">
           <MDBRow>
+                        <div style={{ position: 'fixed', top: '4%', left: '40%', zIndex: 100 }}>
+                <button
+                  onClick={() => AvailabilityToggle('Available')}
+                  style={{
+                    backgroundColor: availabilityStatus === 'Available' ? 'green' : 'grey',
+                    color: 'white',
+                    padding: '10px 20px',
+                    marginRight: '10px',
+                    borderRadius: '5px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                  }}
+                >
+                  Available
+                </button>
+                <button
+                  onClick={() => AvailabilityToggle('Unavailable')}
+                  style={{
+                    backgroundColor: availabilityStatus === 'Unavailable' ? 'red' : 'grey',
+                    color: 'white',
+                    padding: '10px 20px',
+                    borderRadius: '5px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                  }}
+                >
+                  Unavailable
+                </button>
+              </div>
             <MDBCol md="3" style={{ marginLeft: "10%", color: "whitesmoke", marginTop: "4%", height: "7.5%" }}>
               <MDBCard className="h-100 mt-5" style={{ backgroundColor: "#fffdd0" }}>
                 <MDBCardBody>
@@ -312,7 +418,7 @@ function HomePage() {
             )}
 
             {selectedModule === 'Upcoming Rides' && (
-              <MDBCol md="8" style={{ marginLeft: "10%", marginTop: "5%", height: "35vh", width: "50%" }}>
+              <MDBCol md="8" style={{ marginLeft: "10%", marginTop: "5%", height: "60%", width: "50%" }}>
                 <MDBCard className="h-100 mt-4" style={{ backgroundColor: "#fffdd0" }}>
                 
                   <MDBCardBody>
@@ -458,19 +564,28 @@ function HomePage() {
             backgroundColor: '#fffdd0',
             borderRadius: '10px',
             padding: '20px',
-            width: '80%',
+            width: '90%',
             height: '80%',
             zIndex: 1100,
           },
         }}
       >
+        
         <button onClick={() => setModalOpen(false)} style={{ float: 'right', background: 'transparent', border: 'none', fontSize: '1.5rem' }}>&times;</button>
-        <h1 style={{ color: 'green', marginLeft: '40%' }}>TRAVEL ROUTE</h1>
+         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <h1 style={{ color: 'green'}}>TRAVEL ROUTE</h1>
+          <button    
+            onClick={handleStartNavigation} 
+            style={{ fontSize: '16px', padding: '1%', marginRight: '10%', color: 'blue' }}
+          >
+            Start Navigation
+          </button>
+        </div>  
         
         {isLoaded && directionsResponse && directionsResponse.length === 2 && (
           <>
             <GoogleMap
-              mapContainerStyle={{ width: "100%", height: "88%", marginTop: '2%' }}
+              mapContainerStyle={{ width: "98%", height: "88%", marginTop: '2%' }}
               center={center}
               zoom={12}
               options={{

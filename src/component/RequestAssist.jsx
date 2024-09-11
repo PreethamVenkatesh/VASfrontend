@@ -55,14 +55,18 @@ const RequestAssist = () => {
   };
 
   // Handle the booking
-  const handleBooking = async () => { 
+  const handleBooking = async () => {
+    if (!fromLatLng.lat || !fromLatLng.lng || !destinationLatLng.lat || !destinationLatLng.lng) {
+      setBookingError('Please enter valid location coordinates.');
+      return;
+    }
     try {
       const response = await axios.post('http://localhost:8888/api/userlocation', {
         custLocationLat: fromLatLng.lat,
         custLocationLong: fromLatLng.lng,
         date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
         time: new Date().toTimeString().split(' ')[0], // Current time in HH:MM:SS format
-        allocatedVolunteer: 'Preetham', // Example value, you might want to change this
+        // allocatedVolunteer: 'Preetham', // Example value, you might want to change this
         destinationLat: destinationLatLng.lat,
         destinationLong: destinationLatLng.lng,
       });
