@@ -111,7 +111,7 @@ const RequestAssist = () => {
           <label style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>Destination</label>
           <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
             <StandaloneSearchBox
-              onLoad={ref => (destinationSearchBoxRef.current = ref)}
+               onLoad={ref => (destinationSearchBoxRef.current = ref)}
               onPlacesChanged={handleDestinationPlaceChanged}
             >
               <input
