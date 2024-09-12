@@ -25,10 +25,9 @@ function CurrentAssist() {
           feedback
         });
 
-        // If the request is successful, display confirmation
         if (response.status === 201) {
           setConfirmationMessage('Your details have been successfully submitted.');
-          setErrorMessage('');  // Clear error message
+          setErrorMessage('');  
         }
       } catch (error) {
         setErrorMessage('Error submitting the details. Please try again.');
@@ -129,7 +128,7 @@ function CurrentAssist() {
               onChange={(e) => setFeedback(e.target.value)}
               placeholder="Enter your feedback"
               rows="4"
-              style={{ ...inputStyle, resize: 'vertical' }} // Allow vertical resizing
+              style={{ ...inputStyle, resize: 'vertical' }} 
             />
           </div>
 
@@ -147,15 +146,13 @@ function CurrentAssist() {
     </div>
   );
 }
-
-// Updated CSS styling objects
 const containerStyle = {
   display: 'flex',
   justifyContent: 'center',      
   alignItems: 'center',          
   height: '100vh',   
   fontFamily: 'Arial, sans-serif',
-  //backgroundColor: 'white',
+  backgroundColor: 'yellow',
   backgroundSize: 'cover',       
 };
 
@@ -163,7 +160,7 @@ const formContainerStyle = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  backgroundColor: '#fff',
+  backgroundColor: 'yellow',
   padding: '2rem',
   borderRadius: '8px',
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', 
@@ -175,6 +172,8 @@ const headerStyle = {
   color: 'blue',
   fontWeight: 'bold',
   marginBottom: '1.5rem',
+  textDecoration: 'underline',
+  fontSize: '40px'
 };
 
 const formStyle = {
