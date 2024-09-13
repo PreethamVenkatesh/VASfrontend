@@ -21,7 +21,7 @@ function CustomerDashboard() {
             style={{ cursor: 'pointer', width: '50px', height: '50px' }} 
           />
           <br />
-          <span style={{ color: 'blue', fontWeight: 'bolder' }}>Account</span>
+          <span style={{ color: 'blue', fontWeight: 'bolder', fontSize: '18px'}}>Account</span>
         </NavLink>
       </div>
 
@@ -53,7 +53,7 @@ function CustomerDashboard() {
             xs={12} sm={6} md={3}
             style={{
               fontWeight: 'bolder',
-              fontSize: '18px',
+              fontSize: '25px',
               marginBottom: '20px'
             }}
           >
@@ -64,13 +64,13 @@ function CustomerDashboard() {
                 style={{ 
                   cursor: 'pointer', 
                   width: '100%', 
-                  maxWidth: '150px', 
-                  height: 'auto', 
+                  maxWidth: '35%', 
+                  height: '15vh', 
                   marginBottom: '8px' 
                 }} 
               />
               <br />
-              <span style={{ color: 'red' }}>Past Assist</span>
+              <span style={{ color: 'blue' }}>Past Assist</span>
             </NavLink>
           </Col>
 
@@ -78,7 +78,7 @@ function CustomerDashboard() {
             xs={12} sm={4} md={6}
             style={{
               fontWeight: 'bolder',
-              fontSize: '18px',
+              fontSize: '25px',
               marginBottom: '20px'
             }}
           >
@@ -89,13 +89,13 @@ function CustomerDashboard() {
                 style={{ 
                   cursor: 'pointer', 
                   width: '100%', 
-                  maxWidth: '120px', 
-                  height: '100px', 
+                  maxWidth: '35%', 
+                  height: '13vh', 
                   marginBottom: '8px' 
                 }} 
               />
               <br />
-              <span style={{ color: 'red' }}>Request Assistance</span>
+              <span style={{ color: 'blue' }}>Request Assistance</span>
             </NavLink>
             <br />
             <div style={{ margin: '30px 0' }} />
@@ -106,13 +106,13 @@ function CustomerDashboard() {
                 style={{ 
                   cursor: 'pointer', 
                   width: '100%', 
-                  maxWidth: '120px', 
-                  height: '100px', 
+                  maxWidth: '35%', 
+                  height: '14vh', 
                   marginBottom: '8px' 
                 }} 
               />
               <br />
-              <span style={{ color: 'red' }}>Current Assistance</span>
+              <span style={{ color: 'blue' }}>Current Assistance</span>
             </NavLink>
           </Col>
 
@@ -120,7 +120,7 @@ function CustomerDashboard() {
             xs={12} sm={6} md={3}
             style={{
               fontWeight: 'bolder',
-              fontSize: '18px',
+              fontSize: '25px',
               marginBottom: '20px'
             }}
           >
@@ -131,13 +131,13 @@ function CustomerDashboard() {
                 style={{ 
                   cursor: 'pointer', 
                   width: '100%', 
-                  maxWidth: '150px', 
-                  height: 'auto', 
+                  maxWidth: '40%', 
+                  height: '10vh', 
                   marginBottom: '8px' 
                 }} 
               />
               <br />
-              <span style={{ color: 'red' }}>Book Future Assistance</span>
+              <span style={{ color: 'blue' }}>Book Future Assistance</span>
             </NavLink>
           </Col>
         </Row>
@@ -156,9 +156,9 @@ function CustomerDashboard() {
                 <img
                   src={HelpImage}
                   alt='Help'
-                  style={{ width: '100%', maxWidth: '120px', height: 'auto', marginBottom: '8px' }}
+                  style={{ width: '100%', maxWidth: '60%', height: '8vh', marginBottom: '8px' }}
                 />
-                <span style={{ color: 'red', fontWeight: 'bolder' }}>Help</span>
+                <span style={{ color: 'blue', fontWeight: 'bolder', fontSize: '20px'}}>Help</span>
               </NavLink>
             </div>
           </Col>
@@ -168,9 +168,9 @@ function CustomerDashboard() {
                 <img
                   src={FaqsImage}
                   alt='FAQs'
-                  style={{ width: '100%', maxWidth: '120px', height: 'auto', marginBottom: '8px' }}
+                  style={{ width: '100%', maxWidth: '60%', height: '8vh', marginBottom: '8px' }}
                 />
-                <span style={{ color: 'red', fontWeight: 'bolder' }}>FAQs</span>
+                <span style={{ color: 'blue', fontWeight: 'bolder', fontSize: '20px'}}>FAQs</span>
               </NavLink>
             </div>
           </Col> 
