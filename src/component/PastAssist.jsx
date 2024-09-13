@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 function PastAssist() {
-  // Dummy data stored in useState
   const [pastAssists, setPastAssists] = useState([
     {
       date: '2024-09-10',
@@ -26,18 +25,22 @@ function PastAssist() {
     },
   ]);
 
-  // Function to handle rebooking action
   const handleRebook = (index) => {
     alert(`Rebooking assistance for ${pastAssists[index].destination}`);
   };
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
-      <h2 style={{ color: 'blue', marginBottom: '1.5rem' }}>Past Assistance</h2>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+    <div style={{ 
+      fontFamily: 'Arial, sans-serif', 
+      backgroundColor: 'yellow', 
+      minHeight: '100vh',
+      padding: '20px' 
+    }}>
+      <h2 style={{ color: 'blue', marginBottom: '1.5rem',fontWeight: 'bolder',textDecoration: 'underline',fontSize: '40px'}}>Past Assistance</h2>
+      <table style={{ width: '100%'}}>
         <thead>
           <tr style={{ backgroundColor: '#f2f2f2' }}>
-            <th style={tableHeaderStyle}>Date</th>
+            <th style={tableHeaderStyle}>Date</th>  
             <th style={tableHeaderStyle}>Time</th>
             <th style={tableHeaderStyle}>Destination</th>
             <th style={tableHeaderStyle}>Volunteer Name</th>
@@ -57,7 +60,6 @@ function PastAssist() {
                 <button 
                   onClick={() => handleRebook(index)} 
                   style={{ 
-                    padding: '0.5rem 1rem', 
                     backgroundColor: 'blue', 
                     color: 'white', 
                     border: 'none', 
@@ -75,21 +77,18 @@ function PastAssist() {
   );
 }
 
-// Styling for table headers and cells
 const tableHeaderStyle = {
-  padding: '1rem',
   border: '1px solid #ddd',
   fontWeight: 'bold',
   textAlign: 'center',
-  backgroundColor: '#333',  // Background for header row
-  color: 'white',           // White text for header
+  backgroundColor: '#333', 
+  color: 'white', 
 };
 
 const tableCellStyle = {
-  padding: '0.75rem',
   border: '1px solid #ddd',
-  color: 'white',           // White text for table cells
-  backgroundColor: '#444',  // Dark background for table cells
+  color: 'white',  
+  backgroundColor: '#444', 
 };
 
 export default PastAssist;
