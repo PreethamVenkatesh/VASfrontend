@@ -30,10 +30,9 @@ function SignUpRequester() {
     try {
       const response = await axios.post('http://localhost:8888/users', formData);
       console.log(response.data);
-      navigate('/'); // Navigate to home page after successful registration
+      navigate('/');
     } catch (error) {
       console.error('Error registering user:', error.response ? error.response.data : error.message);
-      // Optionally, handle error state in your component
     }
   };
 
