@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 function FAQs() {
-  const [openIndex, setOpenIndex] = useState(null); // To track which question is open
+  const [openIndex, setOpenIndex] = useState(null);
 
   const faqs = [
     {
@@ -81,8 +81,8 @@ function FAQs() {
   };
 
   return (
-    <div style={{ padding: '20px', backgroundColor: '#f8f8f8' }}>
-      <h1 style={{ color: 'blue', fontWeight: 'bold', textDecoration: 'underline' }}>FAQs</h1>
+    <div style={{ padding: '20px', backgroundColor: 'yellow' }}>
+      <h1 style={{ color: 'blue', fontWeight: 'bold',textDecoration: 'underline',fontSize: '40px'}}>FAQs</h1>
       <div style={{ maxWidth: '800px', margin: 'auto' , fontSize: '25px'}}>
         {faqs.map((faq, index) => (
           <div
@@ -101,8 +101,8 @@ function FAQs() {
                 padding: '15px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                backgroundColor: openIndex === index ? '#e6f7ff' : '#333',
-                color: openIndex === index ? '#333' : '#fff',
+                backgroundColor: openIndex === index ? '#e6f7ff' : 'white',
+                color: openIndex === index ? '#333' : 'blue',
               }}
             >
               {faq.question}
