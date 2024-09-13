@@ -43,7 +43,6 @@ function CustomerAccount() {
       [field]: !prevEditMode[field],
     }));
   
-    // Only make the API call if the field is being toggled off (i.e., when the user has finished editing)
     if (editMode[field]) {
       const updatedUser = {
         firstName: userData.firstName,
@@ -71,7 +70,7 @@ function CustomerAccount() {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setProfilePic(e.target.result); // Update the profile picture preview
+        setProfilePic(e.target.result); 
       };
       reader.readAsDataURL(file);
     }
@@ -80,9 +79,7 @@ function CustomerAccount() {
 const navigate  = useNavigate();
 
   const handleSignOut = () => {
-    // Handle sign out logic
     localStorage.clear();
-    // window.location.href = '/login'; // Redirect to login page
   navigate('/')
   };
 
@@ -112,8 +109,8 @@ const navigate  = useNavigate();
   }, [token]);
 
   return (
-    <div>
-      <h1 style={{ color: 'blue', fontWeight: 'bold', textDecoration: 'underline' }}>
+    <div style={{minHeight: '100vh', backgroundColor: 'yellow',padding: '20px'}}>
+      <h1 style={{ color: 'blue', fontWeight: 'bold', textDecoration: 'underline',fontSize: '40px'}}>
         Account
       </h1>
       <Row>
