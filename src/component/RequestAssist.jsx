@@ -15,7 +15,6 @@ const RequestAssist = () => {
   const fromSearchBoxRef = useRef(null);
   const destinationSearchBoxRef = useRef(null);
 
-  // Get the current location of the user when clicking "Use Current Location"
   const useCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -32,7 +31,6 @@ const RequestAssist = () => {
     }
   };
 
-  // Handle place selection for "From" field
   const handleFromPlaceChanged = () => {
     const places = fromSearchBoxRef.current.getPlaces();
     if (places && places.length > 0) {
@@ -43,7 +41,6 @@ const RequestAssist = () => {
     }
   };
 
-  // Handle place selection for "Destination" field
   const handleDestinationPlaceChanged = () => {
     const places = destinationSearchBoxRef.current.getPlaces();
     if (places && places.length > 0) {
@@ -54,7 +51,6 @@ const RequestAssist = () => {
     }
   };
 
-  // Handle the booking
   const handleBooking = async () => {
     if (!fromLatLng.lat || !fromLatLng.lng || !destinationLatLng.lat || !destinationLatLng.lng) {
       setBookingError('Please enter valid location coordinates.');
@@ -64,9 +60,8 @@ const RequestAssist = () => {
       const response = await axios.post('http://localhost:8888/api/userlocation', {
         custLocationLat: fromLatLng.lat,
         custLocationLong: fromLatLng.lng,
-        date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
-        time: new Date().toTimeString().split(' ')[0], // Current time in HH:MM:SS format
-        // allocatedVolunteer: 'Preetham', // Example value, you might want to change this
+        date: new Date().toISOString().split('T')[0], 
+        time: new Date().toTimeString().split(' ')[0], 
         destinationLat: destinationLatLng.lat,
         destinationLong: destinationLatLng.lng,
       });
@@ -82,13 +77,13 @@ const RequestAssist = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
-      <h1 style={{ color: 'blue', fontWeight: 'bold', textDecoration: 'underline' }}>Request Assistance</h1>
-      <form style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ marginTop: '8rem', justifyContent: 'center', width: '100%', maxWidth: '600px' }}>
-          <label style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>From</label>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
+    <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif', textAlign: 'center', backgroundColor: 'yellow', minHeight: '100vh' }}>
+      <h1 style={{ color: 'blue', fontWeight: 'bold', textDecoration: 'underline', fontSize: '40px' }}>Request Assistance</h1>
+      <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
+        <form style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ marginTop: '8rem', justifyContent: 'center', width: '100%', maxWidth: '600px' }}>
+            <label style={{ color: 'blue', fontWeight: 'bold', display: 'block' }}>From</label>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <StandaloneSearchBox
                 onLoad={ref => (fromSearchBoxRef.current = ref)}
                 onPlacesChanged={handleFromPlaceChanged}
@@ -101,15 +96,13 @@ const RequestAssist = () => {
                   style={{ width: '100%', padding: '0.5rem', marginRight: '0.5rem' }}
                 />
               </StandaloneSearchBox>
-            </LoadScript>
-            <button type="button" onClick={useCurrentLocation} style={{ padding: '0.5rem' }}>
-              Use Current Location
-            </button>
+              <button type="button" onClick={useCurrentLocation} style={{ padding: '0.5rem' }}>
+                Use Current Location
+              </button>
+            </div>
           </div>
-        </div>
-        <div style={{ marginBottom: '1rem', width: '100%', maxWidth: '600px' }}>
-          <label style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>Destination</label>
-          <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
+          <div style={{ marginBottom: '1rem', width: '100%', maxWidth: '600px' }}>
+            <label style={{ color: 'blue', fontWeight: 'bold', display: 'block' }}>Destination</label>
             <StandaloneSearchBox
                onLoad={ref => (destinationSearchBoxRef.current = ref)}
               onPlacesChanged={handleDestinationPlaceChanged}
@@ -122,14 +115,14 @@ const RequestAssist = () => {
                 style={{ width: '100%', padding: '0.5rem', marginTop: '0.5rem' }}
               />
             </StandaloneSearchBox>
-          </LoadScript>
-        </div>
-        <button type="button" onClick={handleBooking} style={{ padding: '0.5rem', backgroundColor: 'blue', color: 'white' }}>
-          Book Now
-        </button>
-      </form>
+          </div>
+          <button type="button" onClick={handleBooking} style={{ padding: '0.5rem', backgroundColor: 'blue', color: 'white' }}>
+            Book Now
+          </button>
+        </form>
+      </LoadScript>
 
-      {isBookingComplete && <p style={{ color: 'white', fontWeight: 'bold' }}>Booking Completed Successfully!</p>}
+      {isBookingComplete && <p style={{ color: 'blue', fontWeight: 'bold' }}>Booking Completed Successfully!</p>}
       {bookingError && <p style={{ color: 'red' }}>{bookingError}</p>}
     </div>
   );
