@@ -41,14 +41,6 @@
   }
 }
 
-.custom-bg {
-  /* background-color: #31f265;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center; */
-}
-
 .main-content {
   flex: 1;
   margin-top: 56px; /* Adjust based on navbar height */
@@ -86,27 +78,7 @@
   margin-bottom: 10px; 
 }
 
-.input-wrapper {
-  /* display: flex; */
-  /* align-items: center; */
-   /* Vertically align items in the center */
-  /* gap: 10px;  */
-  /* Space between label and input */
-  /* margin-bottom: 1rem;  */
-  /* Space between each input group */
-  /* margin-left: 40%; */
-}
-
-.input-wrapper .form-label {
-  /* flex: 0 0 150px;  */
-  /* Fixed width for labels */
-  /* margin-bottom: 0;  */
-  /* Remove default margin */
-  /* text-align: right;  */
-  /* Align labels to the right */
-}
-
 .input-wrapper .form-control {
-  flex: 1; /* Allow input to grow and fill available space */
+  flex: 1; 
 }
 

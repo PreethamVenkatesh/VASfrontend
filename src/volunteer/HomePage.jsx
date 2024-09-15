@@ -13,7 +13,8 @@ import "./Style.css";
 Modal.setAppElement('#root');
 
 function HomePage() {
-  const [selectedModule, setSelectedModule] = useState('Upcoming Rides');
+  const [selectedModule, setSelectedModule] = useState(null);
+  const [showProfileCard, setShowProfileCard] = useState(true);
   const [user, setUser] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [center, setCenter] = useState({ lat: 51.6214, lng: -3.9436 }); // Default to Swansea
@@ -26,6 +27,7 @@ function HomePage() {
   const [verificationSuccess, setVerificationSuccess] = useState(false);
   const [vehicleNumber, setVehicleNumber] = useState('');
   const [availabilityStatus, setAvailabilityStatus] = useState('Unavailable');
+  const [showAvailabilityButtons, setShowAvailabilityButtons] = useState(true);
   const navigate = useNavigate();
   const [editableUser, setEditableUser] = useState({
     firstName: '',
@@ -33,6 +35,18 @@ function HomePage() {
     emailId: '',
   });
   const { isLoaded } = useGoogleMaps(); // Use the custom hook
+
+  const handleModuleClick = (module) => {
+    setSelectedModule(module);
+    setShowProfileCard(false);
+    setShowAvailabilityButtons(false);
+  };
+
+  const handleBackClick = () => {
+    setSelectedModule(null);
+    setShowProfileCard(true);
+    setShowAvailabilityButtons(true);
+  };
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -93,23 +107,6 @@ function HomePage() {
     };
   
     startTracking();
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setCenter({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-          setMapLoaded(true); 
-        },
-        (error) => {
-          console.error("Error getting current location:", error);
-          setMapLoaded(true); 
-        }
-      );
-    } else {
-      setMapLoaded(true); 
-    }
   }, [navigate]);
 
   const AvailabilityToggle = async (status) => {
@@ -313,13 +310,15 @@ function HomePage() {
   };
 
   const handleStartNavigation = () => {
-    if (directionsResponse && directionsResponse.length > 0) {
+    if (directionsResponse && directionsResponse.length === 2) {
       const startLat = directionsResponse[0].routes[0].legs[0].start_location.lat();
       const startLng = directionsResponse[0].routes[0].legs[0].start_location.lng();
-      const destLat = directionsResponse[0].routes[0].legs[0].end_location.lat();
-      const destLng = directionsResponse[0].routes[0].legs[0].end_location.lng();
+      const patientLat = directionsResponse[0].routes[0].legs[0].end_location.lat(); // Point B
+      const patientLong = directionsResponse[0].routes[0].legs[0].end_location.lng(); // Point B
+      const destLat = directionsResponse[1].routes[0].legs[0].end_location.lat(); // Point C
+      const destLng = directionsResponse[1].routes[0].legs[0].end_location.lng();
   
-      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${destLat},${destLng}&travelmode=driving`;
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${destLat},${destLng}&waypoints=${patientLat},${patientLong}&travelmode=driving`;
       window.open(googleMapsUrl, '_blank');
     } else {
       toast.error("No directions available");
@@ -328,10 +327,11 @@ function HomePage() {
   
   return (
     <>
-      <div className="custom-bg">
-        <MDBContainer fluid className="main-content mt-0">
-          <MDBRow>
-                        <div style={{ position: 'fixed', top: '4%', left: '40%', zIndex: 100 }}>
+    <div>
+    <MDBContainer>
+      <MDBRow>
+      {showAvailabilityButtons && (
+      <div style={{ position: 'fixed', top: '4%', left: '2%',zIndex: 100 }}>
                 <button
                   onClick={() => AvailabilityToggle('Available')}
                   style={{
@@ -361,68 +361,61 @@ function HomePage() {
                 >
                   Unavailable
                 </button>
-              </div>
-            <MDBCol md="3" style={{ marginLeft: "10%", color: "whitesmoke", marginTop: "4%", height: "7.5%" }}>
-              <MDBCard className="h-100 mt-5" style={{ backgroundColor: "#fffdd0" }}>
-                <MDBCardBody>
-                  <MDBCardTitle>{user ? `${user.firstName} ${user.lastName}` : 'Loading...'}</MDBCardTitle>
-                  <div className="profile-img-container mt-3 mb-3" style={{ marginLeft: "23%"}}>
-                    <img
-                      src={profileImage ? `http://localhost:8888${profileImage}` : "https://via.placeholder.com/150"}
-                      alt="Profile"
-                      className="profile-img"
-                    />
-                  </div>
-                  {getStatusIndicator()}
-                  <MDBListGroup flush>
-                    {['Upcoming Rides', 'Profile Picture', 'History', 'Current Location', 'Update Profile', 'Verify Vehicle', 'Sign out'].map((module) => (
-                      <MDBListGroupItem
-                        key={module}
-                        action
-                        onClick={() => {
-                          if (module === 'Sign out') {
-                            handleSignOut(); 
-                          } else if (module === 'Upcoming Rides') {
-                            fetchUpcomingRides(); 
-                            setSelectedModule(module);
-                          } else if (module === 'Verify Vehicle') {
-                            setVerifyVehicle(true);
-                            setSelectedModule(module);
-                          } else {
-                            setSelectedModule(module);
-                          }
-                        }}
-                        active={selectedModule === module}
-                      >
-                        {module}
-                      </MDBListGroupItem>
-                    ))}
-                  </MDBListGroup>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-
+              </div> )}
+        {showProfileCard ? (
+          <MDBCol md="3" style={{ marginTop: '50px' }} className="profile-card">
+            <MDBCard className="h-100 mt-5 profile-card-body">
+              <MDBCardBody>
+                <MDBCardTitle>{user ? `${user.firstName} ${user.lastName}` : 'Loading...'}</MDBCardTitle>
+                <div className="profile-img-container">
+                  <img
+                    src={profileImage ? `http://localhost:8888${profileImage}` : "https://via.placeholder.com/150"}
+                    alt="Profile"
+                    className="profile-img"
+                  />
+                </div>
+                {getStatusIndicator()}
+                <MDBListGroup flush>
+                  {['Upcoming Rides', 'Profile Picture', 'History', 'Current Location', 'Update Profile', 'Verify Vehicle', 'Sign out'].map((module) => (
+                    <MDBListGroupItem
+                      key={module}
+                      action
+                      onClick={() => handleModuleClick(module)}
+                      active={selectedModule === module}
+                    >
+                      {module}
+                    </MDBListGroupItem>
+                  ))}
+                </MDBListGroup>
+              </MDBCardBody>
+            </MDBCard>
+          </MDBCol>
+        ) : (
+          <>
             {selectedModule === 'Profile Picture' && (
-              <MDBCol md="8" style={{ marginLeft: "10%", marginTop: "5%", height: "35vh", width: "50%" }}>
-                <MDBCard className="h-100 mt-4" style={{ backgroundColor: "#fffdd0" }}>
+              <MDBCol md="8" className="profile-picture-card">
+                <MDBCard className="h-100 mt-4 profile-picture-body">
                   <MDBCardBody>
-                    <MDBCardTitle>Profile Picture</MDBCardTitle>
+                    <MDBCardTitle>
+                      Profile Picture
+                    </MDBCardTitle>
                     <div className="form-group mb-3">
-                      <label style={{marginBottom: "3%", marginTop: "2%"}}>Choose a Profile Picture</label>
+                      <label className="file-label">Choose a Profile Picture</label>
                       <input type="file" className="form-control" onChange={handleImageChange} />
                     </div>
-                    <MDBBtn color="dark" style={{marginTop: "2%"}} onClick={handleImageUpload}>Upload Picture</MDBBtn>
+                    <MDBBtn color="dark" className="upload-btn" onClick={handleImageUpload}>Upload Picture</MDBBtn>
                   </MDBCardBody>
                 </MDBCard>
               </MDBCol>
             )}
 
             {selectedModule === 'Upcoming Rides' && (
-              <MDBCol md="8" style={{ marginLeft: "10%", marginTop: "5%", height: "60%", width: "50%" }}>
-                <MDBCard className="h-100 mt-4" style={{ backgroundColor: "#fffdd0" }}>
-                
+              <MDBCol md="8" className="upcoming-rides-card">
+                <MDBCard className="h-100 mt-4 upcoming-rides-body">
                   <MDBCardBody>
-                    <MDBCardTitle>Upcoming Rides</MDBCardTitle>
+                    <MDBCardTitle>
+                      Upcoming Rides
+                    </MDBCardTitle>
                     <MDBTable striped>
                       <MDBTableHead>
                         <tr>
@@ -447,37 +440,33 @@ function HomePage() {
             )}
 
             {selectedModule === 'Update Profile' && (
-              <MDBCol md="8" style={{ marginLeft: "10%", marginTop: "5%", height: "75vh", width: "50%" }}>
-                <MDBCard className="h-100 mt-4" style={{ backgroundColor: "#fffdd0" }}>
-                <MDBCardBody>
-                    <MDBCardTitle>Update Profile</MDBCardTitle>
+              <MDBCol md="8" className="update-profile-card">
+                <MDBCard className="h-100 mt-4 update-profile-body">
+                  <MDBCardBody>
+                    <MDBCardTitle>
+                      Update Profile
+                    </MDBCardTitle>
                     <div className="text-center mt-5">
                       <form>
-                        <div className="input-wrapper mb-4" style={{ marginLeft: "10%", width: "80%", display: "flex", alignItems: "center" }}>
-                          <label htmlFor="firstName" className="form-label" style={{ fontSize: "20px", fontWeight: "bold", marginRight: "2%" }}>
-                            First Name
-                          </label>
+                        <div className="input-wrapper mb-4">
+                          <label htmlFor="firstName" className="form-label">First Name</label>
                           <MDBInput
-                            id="firstName" name="firstName" type="text" size="lg" className="flex-grow-1" style={{marginLeft: '30%'}} value={editableUser.firstName} onChange={handleInputChange} required
+                            id="firstName" name="firstName" type="text" size="lg" className="flex-grow-1" value={editableUser.firstName} onChange={handleInputChange} required
                           />
                         </div>
-                        <div className="input-wrapper mb-4" style={{ marginLeft: "10%", width: "80%", display: "flex", alignItems: "center" }}>
-                          <label htmlFor="lastName" className="form-label" style={{ fontSize: "20px", fontWeight: "bold", marginRight: "2%" }}>
-                            Last Name
-                          </label>
+                        <div className="input-wrapper mb-4">
+                          <label htmlFor="lastName" className="form-label">Last Name</label>
                           <MDBInput
-                            id="lastName" name="lastName" type="text" size="lg" className="flex-grow-1" style={{marginLeft: '30%'}} value={editableUser.lastName} onChange={handleInputChange} required
+                            id="lastName" name="lastName" type="text" size="lg" className="flex-grow-1" value={editableUser.lastName} onChange={handleInputChange} required
                           />
                         </div>
-                        <div className="input-wrapper mb-4" style={{ marginLeft: "10%", width: "80%", display: "flex", alignItems: "center" }}>
-                          <label htmlFor="emailId" className="form-label" style={{ fontSize: "20px", fontWeight: "bold", marginRight: "2%" }}>
-                            Email Id
-                          </label>
+                        <div className="input-wrapper mb-4">
+                          <label htmlFor="emailId" className="form-label">Email Id</label>
                           <MDBInput
-                            id="emailId" name="emailId" type="text" size="lg" className="flex-grow-1" style={{marginLeft: '40%'}} value={editableUser.emailId} onChange={handleInputChange} required
+                            id="emailId" name="emailId" type="text" size="lg" className="flex-grow-1" value={editableUser.emailId} onChange={handleInputChange} required
                           />
                         </div>
-                        <MDBBtn color="dark" onClick={(e) => {e.preventDefault(); handleUpdateProfile();}} style={{ marginTop: "2%" }}>
+                        <MDBBtn color="dark" className="update-btn" onClick={(e) => { e.preventDefault(); handleUpdateProfile(); }}>
                           Update Profile
                         </MDBBtn>
                       </form>
@@ -485,156 +474,105 @@ function HomePage() {
                   </MDBCardBody>
                 </MDBCard>
               </MDBCol>
-            )}  
+            )}
 
             {selectedModule === 'Verify Vehicle' && (
-                    <MDBCol md="8" style={{ marginLeft: "10%", marginTop: "5%", height: "80%", width: "40%" }}>
-                      <MDBCard className="h-100 mt-5" style={{ backgroundColor: "#fffdd0", height: "100%" }}>
-                        <MDBCardBody>
-                          <MDBCardTitle style={{marginTop: '1%', marginBottom: '3%'}}>Verify Vehicle</MDBCardTitle>
-                          <div className="d-flex align-items-center mb-3 mt-2">
-                            <label htmlFor="vehicleNumber" style={{ marginRight: "5%", fontSize: "18px", fontWeight: "bold" }}>Vehicle Number</label>
-                            <MDBInput
-                              id="vehicleNumber"
-                              type="text"
-                              size="lg"
-                              style={{ flex: 1 }}
-                              value={vehicleNumber}
-                              onChange={(e) => setVehicleNumber(e.target.value)}
-                            />
-                          </div>
-                          <MDBBtn color="primary" style={{ marginTop: "2%" }} onClick={handleVerifyVehicle}>Verify</MDBBtn>
-                        </MDBCardBody>
-                      </MDBCard>
-                    </MDBCol>
-                  )}
-
-            {selectedModule === 'Current Location' && isLoaded && mapLoaded && (
-              <MDBCol md="8" style={{ marginLeft: "4%", marginTop: "5%", height: "80vh", width: "60%" }}>
-                <MDBCard className="h-100 mt-4" style={{ backgroundColor: "#fffdd0" }}>
+              <MDBCol md="8" className="verify-vehicle-card">
+                <MDBCard className="h-100 mt-5 verify-vehicle-body">
                   <MDBCardBody>
-                    <MDBCardTitle>Current Location</MDBCardTitle>
-                    <GoogleMap
-                      center={center}
-                      zoom={12}
-                      mapContainerStyle={{ width: "100%", height: "90%" }}
-                      options={{
-                        zoomControl: false,
-                        streetViewControl: false,
-                        mapTypeControl: false,
-                        fullscreenControl: false,
-                      }}
-                    >
-                      <Marker
-                        position={center}
-                        icon={{
-                          url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                          scaledSize: new window.google.maps.Size(40, 40), // Adjust size of the marker
-                        }}
+                    <MDBCardTitle>
+                      Verify Vehicle
+                    </MDBCardTitle>
+                    <div className="input-wrapper mb-4">
+                      <label htmlFor="vehicleNumber" className="form-label">Vehicle Number</label>
+                      <MDBInput
+                        id="vehicleNumber"
+                        type="text"
+                        size="lg"
+                        value={vehicleNumber}
+                        onChange={(e) => setVehicleNumber(e.target.value)}
                       />
-                    </GoogleMap>
+                    </div>
+                    <MDBBtn color="primary" className="verify-btn" onClick={handleVerifyVehicle}>Verify</MDBBtn>
                   </MDBCardBody>
                 </MDBCard>
               </MDBCol>
             )}
-          </MDBRow>
-        </MDBContainer>
-      </div>
-      <MDBFooter bgColor="dark" className="text-white text-center text-lg-left fixed-bottom">
-        <div className="text-center p-3">
-          &copy; {new Date().getFullYear()} Voluntary Ambulance Services - VAS LiftAssist. All rights reserved.
-          <a className="text-white" href="https://example.com/">License Info</a>
-        </div>
-      </MDBFooter>
-      <Modal
-        isOpen={modalOpen}
-        onRequestClose={() => setModalOpen(false)}
-        contentLabel="Directions Modal"
-        style={{
-          overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
-            zIndex: 1000,
-          },
-          content: {
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            color: 'lightsteelblue',
-            backgroundColor: '#fffdd0',
-            borderRadius: '10px',
-            padding: '20px',
-            width: '90%',
-            height: '80%',
-            zIndex: 1100,
-          },
-        }}
-      >
-        
-        <button onClick={() => setModalOpen(false)} style={{ float: 'right', background: 'transparent', border: 'none', fontSize: '1.5rem' }}>&times;</button>
-         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-          <h1 style={{ color: 'green'}}>TRAVEL ROUTE</h1>
-          <button    
-            onClick={handleStartNavigation} 
-            style={{ fontSize: '16px', padding: '1%', marginRight: '10%', color: 'blue' }}
-          >
-            Start Navigation
-          </button>
-        </div>  
-        
-        {isLoaded && directionsResponse && directionsResponse.length === 2 && (
-          <>
-            <GoogleMap
-              mapContainerStyle={{ width: "98%", height: "88%", marginTop: '2%' }}
-              center={center}
-              zoom={12}
-              options={{
-                zoomControl: true,
-                streetViewControl: true,
-                mapTypeControl: false,
-                fullscreenControl: false,
-              }}
-            >
-              <DirectionsRenderer 
-                directions={directionsResponse[0]} 
-                options={{
-                  polylineOptions: {
-                    strokeColor: 'blue',
-                    strokeOpacity: 0.7,
-                    strokeWeight: 5,
-                  },
-                  suppressMarkers: true,
-                }} 
-              />
-              <Marker 
-                  position={directionsResponse[0].routes[0].legs[0].start_location} 
-                  label="A" 
-                />
-                <Marker 
-                  position={directionsResponse[0].routes[0].legs[0].end_location} 
-                  label="B" 
-                />
-              <DirectionsRenderer 
-                directions={directionsResponse[1]} 
-                options={{
-                  polylineOptions: {
-                    strokeColor: 'green',
-                    strokeOpacity: 0.7,
-                    strokeWeight: 5,
-                  },
-                  suppressMarkers: true,
-                }} 
-              />
-              <Marker 
-                  position={directionsResponse[1].routes[0].legs[0].end_location} 
-                  label="C" 
-                />
-            </GoogleMap>
           </>
         )}
-      </Modal>
-      <ToastContainer/>
-    </>
+      </MDBRow>
+      {(selectedModule || !showProfileCard) && (
+        <div className="back-button-container">
+          <MDBBtn color="secondary" style={{marginTop: '20%'}} onClick={handleBackClick}>Back</MDBBtn>
+        </div>
+      )}
+    </MDBContainer>
+    </div>
+
+    <MDBFooter bgColor="dark" className="text-white text-center text-lg-left fixed-bottom">
+      <div className="text-center p-3">
+        &copy; {new Date().getFullYear()} Voluntary Ambulance Services - VAS LiftAssist. All rights reserved.
+        <a className="text-white" href="https://example.com/">License Info</a>
+      </div>
+    </MDBFooter>
+
+    <Modal
+      isOpen={modalOpen}
+      onRequestClose={() => setModalOpen(false)}
+      contentLabel="Directions Modal"
+      className="directions-modal"
+    >
+      <button onClick={() => setModalOpen(false)} className="close-btn">&times;</button>
+      <div className="modal-header">
+        <h1 className="modal-title">TRAVEL ROUTE</h1>
+        <button onClick={handleStartNavigation} className="start-navigation-btn">Start Navigation</button>
+      </div>
+
+      {isLoaded && directionsResponse && directionsResponse.length === 2 && (
+        <>
+          <GoogleMap
+            mapContainerClassName="modal-map-container"
+            center={center}
+            zoom={12}
+            options={{
+              zoomControl: true,
+              streetViewControl: true,
+              mapTypeControl: false,
+              fullscreenControl: false,
+            }}
+          >
+            <DirectionsRenderer 
+              directions={directionsResponse[0]} 
+              options={{
+                polylineOptions: {
+                  strokeColor: 'blue',
+                  strokeOpacity: 0.7,
+                  strokeWeight: 5,
+                },
+                suppressMarkers: true,
+              }} 
+            />
+            <Marker position={directionsResponse[0].routes[0].legs[0].start_location} label="A" />
+            <Marker position={directionsResponse[0].routes[0].legs[0].end_location} label="B" />
+            <DirectionsRenderer 
+              directions={directionsResponse[1]} 
+              options={{
+                polylineOptions: {
+                  strokeColor: 'green',
+                  strokeOpacity: 0.7,
+                  strokeWeight: 5,
+                },
+                suppressMarkers: true,
+              }} 
+            />
+            <Marker position={directionsResponse[1].routes[0].legs[0].start_location} label="C" />
+            <Marker position={directionsResponse[1].routes[0].legs[0].end_location} label="D" />
+          </GoogleMap>
+        </>
+      )}
+    </Modal>
+</>
+
   );
 }
 
