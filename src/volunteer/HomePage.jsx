@@ -69,8 +69,8 @@ function HomePage() {
           lastName: response.data.lastName,
           emailId: response.data.emailId,
         });
-        const locationsResponse = await axios.get(`http://localhost:8888/locations/${response.data.firstName}`);
-        setLocations(locationsResponse.data);
+        // const locationsResponse = await axios.get(`http://localhost:8888/locations/${response.data.emailId}`);
+        // setLocations(locationsResponse.data);
       } catch (error) {
         console.error('Error fetching user details:', error);
       }
@@ -105,7 +105,6 @@ function HomePage() {
         console.error('Geolocation is not supported by this browser.');
       }
     };
-  
     startTracking();
   }, [navigate]);
 
@@ -157,17 +156,68 @@ function HomePage() {
   };
 
   const fetchUpcomingRides = async () => {
+    const token = localStorage.getItem('token');
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8888/api/user', {
-        headers: {
-          'Authorization': token
-        }
-      });
-      const locationsResponse = await axios.get(`http://localhost:8888/locations/${response.data.firstName}`);
-      setLocations(locationsResponse.data);
+      const userResponse = await axios.get('http://localhost:8888/api/user', {
+      headers: {
+        'Authorization': token,
+      },
+    });
+    const emailId = userResponse.data.emailId;
+    console.log("User's emailId is : " +emailId)
+    const locationsResponse = await axios.get(`http://localhost:8888/api/locations/${emailId}`,{
+      headers: {
+        'Authorization': token,
+      },
+    });
+    console.log("Location Response is: ", locationsResponse.data);
+    const confirmedBookings = locationsResponse.data.filter(
+      booking => booking.bookingStatus === 'Confirmed'
+    );
+    setLocations(confirmedBookings);
     } catch (error) {
       console.error('Error fetching upcoming rides:', error);
+    }
+  };
+
+  const acceptPendingRides = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const userResponse = await axios.get('http://localhost:8888/api/user', {
+      headers: {
+        'Authorization': token,
+      },
+    });
+    const emailId = userResponse.data.emailId;
+    console.log("User's emailId is : " +emailId)
+    const locationsResponse = await axios.get(`http://localhost:8888/api/locations/${emailId}`,{
+      headers: {
+        'Authorization': token,
+      },
+    });
+    console.log("Location Response is: ", locationsResponse.data);
+    const confirmedBookings = locationsResponse.data.filter(
+      booking => booking.bookingStatus === 'Pending'
+    );
+    setLocations(confirmedBookings);
+    } catch (error) {
+      console.error('Error fetching upcoming rides:', error);
+    }
+  };
+
+  const handleAcceptClick = async (location) => {
+    try {
+      await axios.post('http://localhost:8888/api/update-booking-status', {
+        bookingId: location._id,
+        status: 'Confirmed'
+      }, {
+        headers: {
+          'Authorization': localStorage.getItem('token'),
+        },
+      });
+      acceptPendingRides();
+    } catch (error) {
+      console.error('Error accepting ride:', error);
     }
   };
   
@@ -336,13 +386,8 @@ function HomePage() {
                   onClick={() => AvailabilityToggle('Available')}
                   style={{
                     backgroundColor: availabilityStatus === 'Available' ? 'green' : 'grey',
-                    color: 'white',
-                    padding: '10px 20px',
-                    marginRight: '10px',
-                    borderRadius: '5px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '16px',
+                    color: 'white', padding: '10px 20px', marginRight: '10px', borderRadius: '5px',
+                    border: 'none', cursor: 'pointer', fontSize: '16px',
                   }}
                 >
                   Available
@@ -351,12 +396,7 @@ function HomePage() {
                   onClick={() => AvailabilityToggle('Unavailable')}
                   style={{
                     backgroundColor: availabilityStatus === 'Unavailable' ? 'red' : 'grey',
-                    color: 'white',
-                    padding: '10px 20px',
-                    borderRadius: '5px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '16px',
+                    color: 'white', padding: '10px 20px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '16px',
                   }}
                 >
                   Unavailable
@@ -370,17 +410,28 @@ function HomePage() {
                 <div className="profile-img-container">
                   <img
                     src={profileImage ? `http://localhost:8888${profileImage}` : "https://via.placeholder.com/150"}
-                    alt="Profile"
-                    className="profile-img"
+                    alt="Profile" className="profile-img"
                   />
                 </div>
                 {getStatusIndicator()}
                 <MDBListGroup flush>
-                  {['Upcoming Rides', 'Profile Picture', 'History', 'Current Location', 'Update Profile', 'Verify Vehicle', 'Sign out'].map((module) => (
+                  {['Notification - Accept Rides','Upcoming Rides', 'Profile Picture', 'History','Update Profile', 'Verify Vehicle', 'Sign out'].map((module) => (
                     <MDBListGroupItem
                       key={module}
                       action
-                      onClick={() => handleModuleClick(module)}
+                      onClick={() => {
+                        if (module === 'Sign out') {
+                          handleSignOut(); 
+                        } else if (module === 'Notification - Accept Rides') {
+                          acceptPendingRides(); setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
+                        } else if (module === 'Upcoming Rides') {
+                          fetchUpcomingRides(); setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
+                        } else if (module === 'Verify Vehicle') {
+                          setVerifyVehicle(true); setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
+                        } else {
+                          setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
+                        }
+                      }}
                       active={selectedModule === module}
                     >
                       {module}
@@ -409,6 +460,37 @@ function HomePage() {
               </MDBCol>
             )}
 
+            {selectedModule === 'Notification - Accept Rides' && (
+              <MDBCol md="8" className="upcoming-rides-card">
+                <MDBCard className="h-100 mt-4 upcoming-rides-body">
+                  <MDBCardBody>
+                    <MDBCardTitle>
+                      Accept Rides
+                    </MDBCardTitle>
+                    <MDBTable striped>
+                      <MDBTableHead>
+                        <tr>
+                          <th>Date</th> <th>Time</th> <th>Action</th>
+                        </tr>
+                      </MDBTableHead>
+                      <MDBTableBody>
+                        {locations.map((location) => (
+                          <tr key={location._id}>
+                            <td>{new Date(location.date).toISOString().split('T')[0]}</td>
+                            <td>{location.time}</td>
+                            <td>
+                              <MDBBtn size="sm" color="success" onClick={() => handleAcceptClick(location)}>Accept</MDBBtn>
+                              <MDBBtn style={{marginLeft: '10%'}} size="sm" color="danger" onClick={() => handleStartClick(location)}>Decline</MDBBtn>
+                              </td>
+                          </tr>
+                        ))}
+                      </MDBTableBody>
+                    </MDBTable>
+                  </MDBCardBody>
+                </MDBCard>
+              </MDBCol>
+            )}
+
             {selectedModule === 'Upcoming Rides' && (
               <MDBCol md="8" className="upcoming-rides-card">
                 <MDBCard className="h-100 mt-4 upcoming-rides-body">
@@ -419,9 +501,7 @@ function HomePage() {
                     <MDBTable striped>
                       <MDBTableHead>
                         <tr>
-                          <th>Date</th>
-                          <th>Time</th>
-                          <th>Action</th>
+                          <th>Date</th> <th>Time</th> <th>Action</th>
                         </tr>
                       </MDBTableHead>
                       <MDBTableBody>
@@ -486,10 +566,7 @@ function HomePage() {
                     <div className="input-wrapper mb-4">
                       <label htmlFor="vehicleNumber" className="form-label">Vehicle Number</label>
                       <MDBInput
-                        id="vehicleNumber"
-                        type="text"
-                        size="lg"
-                        value={vehicleNumber}
+                        id="vehicleNumber" type="text" size="lg" value={vehicleNumber}
                         onChange={(e) => setVehicleNumber(e.target.value)}
                       />
                     </div>
@@ -531,24 +608,15 @@ function HomePage() {
       {isLoaded && directionsResponse && directionsResponse.length === 2 && (
         <>
           <GoogleMap
-            mapContainerClassName="modal-map-container"
-            center={center}
-            zoom={12}
+            mapContainerClassName="modal-map-container" center={center} zoom={12}
             options={{
-              zoomControl: true,
-              streetViewControl: true,
-              mapTypeControl: false,
-              fullscreenControl: false,
+              zoomControl: true, streetViewControl: true, mapTypeControl: false, fullscreenControl: false,
             }}
           >
             <DirectionsRenderer 
               directions={directionsResponse[0]} 
               options={{
-                polylineOptions: {
-                  strokeColor: 'blue',
-                  strokeOpacity: 0.7,
-                  strokeWeight: 5,
-                },
+                polylineOptions: { strokeColor: 'blue', strokeOpacity: 0.7, strokeWeight: 5,},
                 suppressMarkers: true,
               }} 
             />
@@ -557,11 +625,7 @@ function HomePage() {
             <DirectionsRenderer 
               directions={directionsResponse[1]} 
               options={{
-                polylineOptions: {
-                  strokeColor: 'green',
-                  strokeOpacity: 0.7,
-                  strokeWeight: 5,
-                },
+                polylineOptions: { strokeColor: 'green', strokeOpacity: 0.7, strokeWeight: 5,},
                 suppressMarkers: true,
               }} 
             />
@@ -571,9 +635,7 @@ function HomePage() {
         </>
       )}
     </Modal>
-</>
-
+  </>
   );
 }
-
 export default HomePage;
