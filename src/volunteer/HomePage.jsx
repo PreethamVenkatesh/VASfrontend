@@ -180,6 +180,31 @@ function HomePage() {
     }
   };
 
+  const fetchCompletedRides = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const userResponse = await axios.get('http://localhost:8888/api/user', {
+      headers: {
+        'Authorization': token,
+      },
+    });
+    const emailId = userResponse.data.emailId;
+    console.log("User's emailId is : " +emailId)
+    const locationsResponse = await axios.get(`http://localhost:8888/api/locations/${emailId}`,{
+      headers: {
+        'Authorization': token,
+      },
+    });
+    console.log("Location Response is: ", locationsResponse.data);
+    const confirmedBookings = locationsResponse.data.filter(
+      booking => booking.rideStatus === 'Completed'
+    );
+    setLocations(confirmedBookings);
+    } catch (error) {
+      console.error('Error fetching upcoming rides:', error);
+    }
+  };
+
   const acceptPendingRides = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -439,6 +464,8 @@ function HomePage() {
                       onClick={() => {
                         if (module === 'Sign out') {
                           handleSignOut(); 
+                        } else if (module === 'Past Rides - History') {
+                          fetchCompletedRides(); setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
                         } else if (module === 'Notification - Accept Rides') {
                           acceptPendingRides(); setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
                         } else if (module === 'Upcoming Rides') {
@@ -528,6 +555,33 @@ function HomePage() {
                             <td>{location.time}</td>
                             <td><MDBBtn size="sm" color="success" onClick={() => handleStartClick(location)}>Start</MDBBtn></td>
                             <td><MDBBtn size="sm" color="success" onClick={() => updateRideStatus(location)}>Completed</MDBBtn></td>
+                          </tr>
+                        ))}
+                      </MDBTableBody>
+                    </MDBTable>
+                  </MDBCardBody>
+                </MDBCard>
+              </MDBCol>
+            )}
+
+            {selectedModule === 'Past Rides - History' && (
+              <MDBCol md="8" className="upcoming-rides-card">
+                <MDBCard className="h-100 mt-4 upcoming-rides-body">
+                  <MDBCardBody>
+                    <MDBCardTitle>
+                      Past Rides - History
+                    </MDBCardTitle>
+                    <MDBTable striped>
+                      <MDBTableHead>
+                        <tr>
+                          <th>Date</th> <th>Time</th> <th>Rating</th>
+                        </tr>
+                      </MDBTableHead>
+                      <MDBTableBody>
+                        {locations.map((location) => (
+                          <tr key={location._id}>
+                            <td>{new Date(location.date).toISOString().split('T')[0]}</td>
+                            <td>{location.time}</td>
                           </tr>
                         ))}
                       </MDBTableBody>
