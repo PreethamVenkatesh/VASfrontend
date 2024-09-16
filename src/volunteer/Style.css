@@ -122,13 +122,16 @@
   .map-container,
   .modal-map-container {
     width: 100%;
-    height: 400px;
+    height: 600px;
   }
   
   .directions-modal {
     padding: 20px;
     width: 90%;
+    height: 90%;
     margin: auto;
+    background-color: #fffdd0; /* White background for modal content */
+    position: relative; /* Needed for positioning the close button */
   }
   
   .close-btn {
@@ -139,6 +142,7 @@
     right: 15px;
     border: none;
     background: none;
+    z-index: 1; /* Ensure the button is above other elements */
   }
   
   .modal-header {
@@ -156,6 +160,10 @@
     padding: 10px 20px;
     font-size: 18px;
     cursor: pointer;
+  }
+
+  .ReactModal__Overlay {
+    background-color: rgba(0, 0, 0, 0.5); 
   }
   
   @media (max-width: 900px) {
@@ -209,7 +217,7 @@
   
     .map-container,
     .modal-map-container {
-      height: 300px;
+      height: 550px;
     }
   
     .modal-header {
@@ -222,8 +230,18 @@
     }
   
     .start-navigation-btn {
-      width: 100%;
-      padding: 10px;
+      width: 70%;
+      padding: 5px;
       font-size: 16px;
+    }
+
+    .directions-modal {
+      padding: 20px;
+      width: 90%;
+      height: 80%;
+      margin: auto;
+      background-color: #fffdd0; /* White background for modal content */
+      position: relative; /* Needed for positioning the close button */
+      margin-top: 30px;
     }
   }
