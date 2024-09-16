@@ -172,7 +172,7 @@ function HomePage() {
     });
     console.log("Location Response is: ", locationsResponse.data);
     const confirmedBookings = locationsResponse.data.filter(
-      booking => booking.bookingStatus === 'Confirmed'
+      booking => booking.bookingStatus === 'Confirmed' && booking.rideStatus === 'Not Started'
     );
     setLocations(confirmedBookings);
     } catch (error) {
@@ -205,6 +205,7 @@ function HomePage() {
     }
   };
 
+
   const handleAcceptClick = async (location) => {
     try {
       await axios.post('http://localhost:8888/api/update-booking-status', {
@@ -218,6 +219,22 @@ function HomePage() {
       acceptPendingRides();
     } catch (error) {
       console.error('Error accepting ride:', error);
+    }
+  };
+
+  const updateRideStatus = async (location) => {
+    try {
+      await axios.post('http://localhost:8888/api/update-ride-status', {
+          bookingId: location._id,
+          status: 'Completed'
+        },{
+          headers: {
+            'Authorization': localStorage.getItem('token'),
+          },
+        });
+        fetchUpcomingRides();
+    } catch (error) {
+      console.error('Error updating ride status:', error.message);
     }
   };
   
@@ -363,9 +380,9 @@ function HomePage() {
     if (directionsResponse && directionsResponse.length === 2) {
       const startLat = directionsResponse[0].routes[0].legs[0].start_location.lat();
       const startLng = directionsResponse[0].routes[0].legs[0].start_location.lng();
-      const patientLat = directionsResponse[0].routes[0].legs[0].end_location.lat(); // Point B
-      const patientLong = directionsResponse[0].routes[0].legs[0].end_location.lng(); // Point B
-      const destLat = directionsResponse[1].routes[0].legs[0].end_location.lat(); // Point C
+      const patientLat = directionsResponse[0].routes[0].legs[0].end_location.lat(); 
+      const patientLong = directionsResponse[0].routes[0].legs[0].end_location.lng(); 
+      const destLat = directionsResponse[1].routes[0].legs[0].end_location.lat(); 
       const destLng = directionsResponse[1].routes[0].legs[0].end_location.lng();
   
       const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${destLat},${destLng}&waypoints=${patientLat},${patientLong}&travelmode=driving`;
@@ -415,7 +432,7 @@ function HomePage() {
                 </div>
                 {getStatusIndicator()}
                 <MDBListGroup flush>
-                  {['Notification - Accept Rides','Upcoming Rides', 'Profile Picture', 'History','Update Profile', 'Verify Vehicle', 'Sign out'].map((module) => (
+                  {['Notification - Accept Rides','Upcoming Rides', 'Past Rides - History', 'Profile Picture', 'Update Profile', 'Verify Vehicle', 'Sign out'].map((module) => (
                     <MDBListGroupItem
                       key={module}
                       action
@@ -501,7 +518,7 @@ function HomePage() {
                     <MDBTable striped>
                       <MDBTableHead>
                         <tr>
-                          <th>Date</th> <th>Time</th> <th>Action</th>
+                          <th>Date</th> <th>Time</th> <th>Action</th> <th>Status</th>
                         </tr>
                       </MDBTableHead>
                       <MDBTableBody>
@@ -510,6 +527,7 @@ function HomePage() {
                             <td>{new Date(location.date).toISOString().split('T')[0]}</td>
                             <td>{location.time}</td>
                             <td><MDBBtn size="sm" color="success" onClick={() => handleStartClick(location)}>Start</MDBBtn></td>
+                            <td><MDBBtn size="sm" color="success" onClick={() => updateRideStatus(location)}>Completed</MDBBtn></td>
                           </tr>
                         ))}
                       </MDBTableBody>
@@ -601,8 +619,8 @@ function HomePage() {
     >
       <button onClick={() => setModalOpen(false)} className="close-btn">&times;</button>
       <div className="modal-header">
-        <h1 className="modal-title">TRAVEL ROUTE</h1>
-        <button onClick={handleStartNavigation} className="start-navigation-btn">Start Navigation</button>
+        <h1 style={{marginLeft: '10%', fontSize: '24px'}} className="modal-title">TRAVEL ROUTE</h1>
+        <button style={{marginRight: '5%'}} onClick={handleStartNavigation} className="start-navigation-btn">Start Navigation</button>
       </div>
 
       {isLoaded && directionsResponse && directionsResponse.length === 2 && (
@@ -629,8 +647,8 @@ function HomePage() {
                 suppressMarkers: true,
               }} 
             />
-            <Marker position={directionsResponse[1].routes[0].legs[0].start_location} label="C" />
-            <Marker position={directionsResponse[1].routes[0].legs[0].end_location} label="D" />
+            <Marker position={directionsResponse[1].routes[0].legs[0].start_location} label="B" />
+            <Marker position={directionsResponse[1].routes[0].legs[0].end_location} label="C" />
           </GoogleMap>
         </>
       )}
