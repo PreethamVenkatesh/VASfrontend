@@ -14,6 +14,7 @@ import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import CustHome from './Modals/CustHome';
 import CustWork from './Modals/CustWork';
+import { FaArrowLeft } from 'react-icons/fa';
 
 function CustomerAccount() {
   const token = localStorage.getItem('token');
@@ -110,6 +111,11 @@ const navigate  = useNavigate();
 
   return (
     <div style={{minHeight: '100vh', backgroundColor: 'yellow',padding: '20px'}}>
+      <div
+        style={{position: 'absolute',left: '60px',top: '30px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
+        onClick={() => navigate('/customerPage')}>
+        <FaArrowLeft size={30} color="blue" />
+      </div>
       <h1 style={{ color: 'blue', fontWeight: 'bold', textDecoration: 'underline',fontSize: '40px'}}>
         Account
       </h1>

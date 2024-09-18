@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { LoadScript, StandaloneSearchBox } from '@react-google-maps/api';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
 
 const libraries = ['places'];
 
@@ -14,6 +16,7 @@ const RequestAssist = () => {
   const [bookingError, setBookingError] = useState('');
   const fromSearchBoxRef = useRef(null);
   const destinationSearchBoxRef = useRef(null);
+  const navigate = useNavigate();
 
   const useCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -78,6 +81,11 @@ const RequestAssist = () => {
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif', textAlign: 'center', backgroundColor: 'yellow', minHeight: '100vh' }}>
+      <div
+        style={{position: 'absolute',left: '60px',top: '40px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
+        onClick={() => navigate('/customerPage')}>
+        <FaArrowLeft size={30} color="blue" />
+      </div>
       <h1 style={{ color: 'blue', fontWeight: 'bold', textDecoration: 'underline', fontSize: '40px' }}>Request Assistance</h1>
       <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
         <form style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

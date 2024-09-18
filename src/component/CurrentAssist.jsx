@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
 
 function CurrentAssist() {
   const [bookingConfirmation, setBookingConfirmation] = useState('Yes');
@@ -10,6 +12,7 @@ function CurrentAssist() {
   const [feedback, setFeedback] = useState('');
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,7 +46,12 @@ function CurrentAssist() {
   return (
     <div style={containerStyle}>
       <div style={formContainerStyle}>
-        <h2 style={headerStyle}>Current Assistance Details</h2>
+      <div
+        style={{position: 'absolute',left: '60px',top: '40px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
+        onClick={() => navigate('/customerPage')}>
+        <FaArrowLeft size={30} color="blue" />
+      </div>
+        <h2 style={headerStyle}>Current Assistance</h2>
         <form onSubmit={handleSubmit} style={formStyle}>
           <div style={formGroupStyle}>
             <label style={labelStyle}>Booking Confirmation:</label>

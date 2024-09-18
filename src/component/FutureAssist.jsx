@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
 
 function FutureAssist() {
   const [fromLocation, setFromLocation] = useState('');
@@ -8,6 +10,7 @@ function FutureAssist() {
   const [time, setTime] = useState('');
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,6 +43,11 @@ function FutureAssist() {
   return (
     <div style={pageContainerStyle}> 
       <div style={containerStyle}>
+      <div
+        style={{position: 'absolute',left: '40px',top: '80px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
+        onClick={() => navigate('/customerPage')}>
+        <FaArrowLeft size={30} color="blue" />
+      </div>
         <h2 style={headerStyle}>Book Future Assistance</h2>
         <form onSubmit={handleSubmit} style={formStyle}>
           <div style={formGroupStyle}>

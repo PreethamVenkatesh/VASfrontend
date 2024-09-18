@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
 
 function FAQs() {
   const [openIndex, setOpenIndex] = useState(null);
+  const navigate = useNavigate();
 
   const faqs = [
     {
@@ -82,6 +85,11 @@ function FAQs() {
 
   return (
     <div style={{ padding: '20px', backgroundColor: 'yellow' }}>
+      <div
+        style={{position: 'absolute',left: '80px',top: '30px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
+        onClick={() => navigate('/customerPage')}>
+        <FaArrowLeft size={30} color="blue" />
+      </div>
       <h1 style={{ color: 'blue', fontWeight: 'bold',textDecoration: 'underline',fontSize: '40px'}}>FAQs</h1>
       <div style={{ maxWidth: '800px', margin: 'auto' , fontSize: '25px'}}>
         {faqs.map((faq, index) => (

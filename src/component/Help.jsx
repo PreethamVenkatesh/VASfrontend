@@ -1,10 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
 
 function Help() {
   const googleDriveVideoLink = 'https://drive.google.com/file/d/1a6MCYeJq06C1PrMmSEq0R4eSvHeFtWnT/preview';
-
+  const navigate = useNavigate();
   return (
     <div style={containerStyle}>
+      <div
+        style={{position: 'absolute',left: '80px',top: '30px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
+        onClick={() => navigate('/customerPage')}>
+        <FaArrowLeft size={30} color="blue" />
+      </div>
       <h1 style={headerStyle}>Help</h1>
       <div style={formContainerStyle}>
         <form style={formStyle}>
@@ -24,7 +31,7 @@ function Help() {
             <input
               type="text"
               id="emailID"
-              value="support@volambulance.com"
+              value="volambulance@gmail.com"
               readOnly
               style={inputStyle}
             />

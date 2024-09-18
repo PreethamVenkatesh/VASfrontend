@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
 
 function PastAssist() {
+  const navigate = useNavigate();
   const [pastAssists, setPastAssists] = useState([
     {
       date: '2024-09-10',
@@ -36,7 +39,12 @@ function PastAssist() {
       minHeight: '100vh',
       padding: '20px' 
     }}>
-      <h2 style={{ color: 'blue', marginBottom: '1.5rem',fontWeight: 'bolder',textDecoration: 'underline',fontSize: '40px'}}>Past Assistance</h2>
+      <div
+        style={{position: 'absolute',left: '70px',top: '30px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
+        onClick={() => navigate('/customerPage')}>
+        <FaArrowLeft size={30} color="blue" />
+      </div>
+      <h2 style={{ color: 'blue', marginBottom: '1.5rem',fontWeight: 'bolder',textDecoration: 'underline',fontSize: '40px'}}>Past <br/>Assistance</h2>
       <table style={{ width: '100%'}}>
         <thead>
           <tr style={{ backgroundColor: '#f2f2f2' }}>
