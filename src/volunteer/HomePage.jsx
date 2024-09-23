@@ -28,6 +28,9 @@ function HomePage() {
   const [vehicleNumber, setVehicleNumber] = useState('');
   const [availabilityStatus, setAvailabilityStatus] = useState('Unavailable');
   const [showAvailabilityButtons, setShowAvailabilityButtons] = useState(true);
+  const [pendingRidesCount, setPendingRidesCount] = useState(0);
+  const [confirmedRidesCount, setConfirmedRidesCount] = useState(0);
+  const [completedRidesCount, setCompletedRidesCount] = useState(0);
   const navigate = useNavigate();
   const [editableUser, setEditableUser] = useState({
     firstName: '',
@@ -69,8 +72,6 @@ function HomePage() {
           lastName: response.data.lastName,
           emailId: response.data.emailId,
         });
-        // const locationsResponse = await axios.get(`http://localhost:8888/locations/${response.data.emailId}`);
-        // setLocations(locationsResponse.data);
       } catch (error) {
         console.error('Error fetching user details:', error);
       }
@@ -106,6 +107,7 @@ function HomePage() {
       }
     };
     startTracking();
+    fetchUpcomingRides();
   }, [navigate]);
 
   const AvailabilityToggle = async (status) => {
@@ -174,6 +176,18 @@ function HomePage() {
     const confirmedBookings = locationsResponse.data.filter(
       booking => booking.bookingStatus === 'Confirmed' && booking.rideStatus === 'Not Started'
     );
+    const pendingRides = locationsResponse.data.filter(
+      (booking) => booking.bookingStatus === 'Pending' && booking.rideStatus === 'Not Started'
+    );
+    const confirmedRides = locationsResponse.data.filter(
+      (booking) => booking.bookingStatus === 'Confirmed' && booking.rideStatus === 'Not Started'
+    );
+    const completedRides = locationsResponse.data.filter(
+      (booking) => booking.rideStatus === 'Completed'
+    );
+    setPendingRidesCount(pendingRides.length);
+    setConfirmedRidesCount(confirmedRides.length);
+    setCompletedRidesCount(completedRides.length);
     setLocations(confirmedBookings);
     } catch (error) {
       console.error('Error fetching upcoming rides:', error);
@@ -230,7 +244,6 @@ function HomePage() {
     }
   };
 
-
   const handleAcceptClick = async (location) => {
     try {
       await axios.post('http://localhost:8888/api/update-booking-status', {
@@ -241,7 +254,12 @@ function HomePage() {
           'Authorization': localStorage.getItem('token'),
         },
       });
+      toast.success('Booking accepted succesfully');
       acceptPendingRides();
+      setSelectedModule(null);
+      setShowProfileCard(true);
+      setShowAvailabilityButtons(true);
+      fetchUpcomingRides();
     } catch (error) {
       console.error('Error accepting ride:', error);
     }
@@ -257,7 +275,11 @@ function HomePage() {
             'Authorization': localStorage.getItem('token'),
           },
         });
+        toast.success('Ride completed succesfully');
         fetchUpcomingRides();
+        setSelectedModule(null);
+        setShowProfileCard(true);
+        setShowAvailabilityButtons(true);
     } catch (error) {
       console.error('Error updating ride status:', error.message);
     }
@@ -424,26 +446,26 @@ function HomePage() {
       <MDBRow>
       {showAvailabilityButtons && (
       <div style={{ position: 'fixed', top: '4%', left: '2%',zIndex: 100 }}>
-                <button
-                  onClick={() => AvailabilityToggle('Available')}
-                  style={{
-                    backgroundColor: availabilityStatus === 'Available' ? 'green' : 'grey',
-                    color: 'white', padding: '10px 20px', marginRight: '10px', borderRadius: '5px',
-                    border: 'none', cursor: 'pointer', fontSize: '16px',
-                  }}
-                >
-                  Available
-                </button>
-                <button
-                  onClick={() => AvailabilityToggle('Unavailable')}
-                  style={{
-                    backgroundColor: availabilityStatus === 'Unavailable' ? 'red' : 'grey',
-                    color: 'white', padding: '10px 20px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '16px',
-                  }}
-                >
-                  Unavailable
-                </button>
-              </div> )}
+        <button
+          onClick={() => AvailabilityToggle('Available')}
+          style={{
+            backgroundColor: availabilityStatus === 'Available' ? 'green' : 'grey',
+            color: 'white', padding: '10px 20px', marginRight: '10px', borderRadius: '5px',
+            border: 'none', cursor: 'pointer', fontSize: '16px',
+          }}
+        >
+          Available
+        </button>
+        <button
+          onClick={() => AvailabilityToggle('Unavailable')}
+          style={{
+            backgroundColor: availabilityStatus === 'Unavailable' ? 'red' : 'grey',
+            color: 'white', padding: '10px 20px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '16px',
+          }}
+        >
+          Unavailable
+        </button>
+      </div> )}
         {showProfileCard ? (
           <MDBCol md="3" style={{ marginTop: '50px' }} className="profile-card">
             <MDBCard className="h-100 mt-5 profile-card-body">
@@ -457,31 +479,95 @@ function HomePage() {
                 </div>
                 {getStatusIndicator()}
                 <MDBListGroup flush>
-                  {['Notification - Accept Rides','Upcoming Rides', 'Past Rides - History', 'Profile Picture', 'Update Profile', 'Verify Vehicle', 'Sign out'].map((module) => (
-                    <MDBListGroupItem
-                      key={module}
-                      action
-                      onClick={() => {
-                        if (module === 'Sign out') {
-                          handleSignOut(); 
-                        } else if (module === 'Past Rides - History') {
-                          fetchCompletedRides(); setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
-                        } else if (module === 'Notification - Accept Rides') {
-                          acceptPendingRides(); setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
-                        } else if (module === 'Upcoming Rides') {
-                          fetchUpcomingRides(); setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
-                        } else if (module === 'Verify Vehicle') {
-                          setVerifyVehicle(true); setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
-                        } else {
-                          setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
-                        }
+              {[
+                { name: 'Notification - Accept Rides', count: pendingRidesCount },
+                { name: 'Upcoming Rides', count: confirmedRidesCount},
+                { name: 'Past Rides - History', count: completedRidesCount },
+                { name: 'Profile Picture' },
+                { name: 'Update Profile' },
+                { name: 'Verify Vehicle' },
+                { name: 'Sign out' },
+              ].map((module, index) => (
+                <MDBListGroupItem
+                  key={module.name}
+                  action
+                  onClick={() => {
+                    if (module.name === 'Sign out') {
+                      handleSignOut();
+                    } else if (module.name === 'Past Rides - History') {
+                      fetchCompletedRides();
+                      setSelectedModule(module.name);
+                      setShowProfileCard(false);
+                      setShowAvailabilityButtons(false);
+                    } else if (module.name === 'Notification - Accept Rides') {
+                      acceptPendingRides();
+                      setSelectedModule(module.name);
+                      setShowProfileCard(false);
+                      setShowAvailabilityButtons(false);
+                    } else if (module.name === 'Upcoming Rides') {
+                      fetchUpcomingRides();
+                      setSelectedModule(module.name);
+                      setShowProfileCard(false);
+                      setShowAvailabilityButtons(false);
+                    } else if (module.name === 'Verify Vehicle') {
+                      setVerifyVehicle(true);
+                      setSelectedModule(module.name);
+                      setShowProfileCard(false);
+                      setShowAvailabilityButtons(false);
+                    } else {
+                      setSelectedModule(module.name);
+                      setShowProfileCard(false);
+                      setShowAvailabilityButtons(false);
+                    }
+                  }}
+                  active={selectedModule === module.name}
+                >
+                  {module.name}
+                  {module.name === 'Notification - Accept Rides' && module.count > 0 && (
+                    <span
+                      style={{
+                        backgroundColor: 'red',
+                        color: 'white',
+                        borderRadius: '12px',
+                        padding: '3px 8px',
+                        marginLeft: '10px',
+                        fontSize: '0.9rem',
                       }}
-                      active={selectedModule === module}
                     >
-                      {module}
-                    </MDBListGroupItem>
-                  ))}
-                </MDBListGroup>
+                      {module.count}
+                    </span>
+                  )}
+                  {module.name === 'Upcoming Rides' && module.count > 0 && (
+                    <span
+                      style={{
+                        backgroundColor: 'blue',
+                        color: 'white',
+                        borderRadius: '12px',
+                        padding: '3px 8px',
+                        marginLeft: '10px',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      {module.count}
+                    </span>
+                  )}
+                  {module.name === 'Past Rides - History' && module.count > 0 && (
+                    <span
+                      style={{
+                        backgroundColor: 'green',
+                        color: 'white',
+                        borderRadius: '12px',
+                        padding: '3px 8px',
+                        marginLeft: '10px',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      {module.count}
+                    </span>
+                  )}
+                </MDBListGroupItem>
+              ))}
+            </MDBListGroup>
               </MDBCardBody>
             </MDBCard>
           </MDBCol>
@@ -648,7 +734,7 @@ function HomePage() {
               </MDBCol>
             )}
           </>
-        )}
+            )}
       </MDBRow>
       {(selectedModule || !showProfileCard) && (
         <div className="back-button-container">
@@ -707,6 +793,7 @@ function HomePage() {
         </>
       )}
     </Modal>
+    <ToastContainer/>
   </>
   );
 }

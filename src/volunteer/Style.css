@@ -130,8 +130,8 @@
     width: 90%;
     height: 90%;
     margin: auto;
-    background-color: #fffdd0; /* White background for modal content */
-    position: relative; /* Needed for positioning the close button */
+    background-color: #fffdd0; 
+    position: relative; 
   }
   
   .close-btn {
@@ -142,7 +142,7 @@
     right: 15px;
     border: none;
     background: none;
-    z-index: 1; /* Ensure the button is above other elements */
+    z-index: 1; 
   }
   
   .modal-header {
@@ -240,8 +240,8 @@
       width: 90%;
       height: 80%;
       margin: auto;
-      background-color: #fffdd0; /* White background for modal content */
-      position: relative; /* Needed for positioning the close button */
+      background-color: #fffdd0; 
+      position: relative;
       margin-top: 30px;
     }
   }
