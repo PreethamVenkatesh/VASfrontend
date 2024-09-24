@@ -14,6 +14,7 @@ import FutureAssist from './component/FutureAssist';
 import CustomerAccount from './component/CustomerAccount';
 import Help from './component/Help';
 import FAQ from './component/FAQs';
+import Navigation from './volunteer/Navigation';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path='/account' element={<CustomerAccount />} />
           <Route path='/help' element={<Help />} />
           <Route path='/faqs' element={<FAQ />} />
+          <Route path="/navigation" element={<Navigation />} />
           <Route
             path="/home"
             element={
