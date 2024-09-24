@@ -1,4 +1,4 @@
-import { GoogleMap, DirectionsRenderer, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { useJsApiLoader } from "@react-google-maps/api";
 
 const useGoogleMaps = () => {
   const { isLoaded, loadError } = useJsApiLoader({

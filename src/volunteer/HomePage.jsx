@@ -31,6 +31,8 @@ function HomePage() {
   const [pendingRidesCount, setPendingRidesCount] = useState(0);
   const [confirmedRidesCount, setConfirmedRidesCount] = useState(0);
   const [completedRidesCount, setCompletedRidesCount] = useState(0);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [emailId, setEmailId] = useState('');
   const navigate = useNavigate();
   const [editableUser, setEditableUser] = useState({
     firstName: '',
@@ -108,6 +110,7 @@ function HomePage() {
     };
     startTracking();
     fetchUpcomingRides();
+    getStatusIndicator();
   }, [navigate]);
 
   const AvailabilityToggle = async (status) => {
@@ -432,10 +435,34 @@ function HomePage() {
       const destLat = directionsResponse[1].routes[0].legs[0].end_location.lat(); 
       const destLng = directionsResponse[1].routes[0].legs[0].end_location.lng();
   
-      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${destLat},${destLng}&waypoints=${patientLat},${patientLong}&travelmode=driving`;
-      window.open(googleMapsUrl, '_blank');
+      // const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${destLat},${destLng}&waypoints=${patientLat},${patientLong}&travelmode=driving`;
+      // window.open(googleMapsUrl, '_blank');
+      navigate('/navigation', { state: { startLat, startLng, patientLat, patientLong, destLat, destLng } });
     } else {
       toast.error("No directions available");
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const userResponse = await axios.get('http://localhost:8888/api/user', {
+      headers: {
+        'Authorization': token,
+      },
+    });
+    const emailId = userResponse.data.emailId;
+      const response = await axios.post('http://localhost:8888/api/verify-email', {
+        emailId,
+        verificationCode
+      });
+      
+      if (response.status === 200) {
+        toast.success('Email verified successfully!');
+      }
+    } catch (error) {
+      console.error('Error verifying email:', error);
+      toast.error('Failed to verify email: ' + (error.response ? error.response.data.message : error.message));
     }
   };
   
@@ -722,6 +749,14 @@ function HomePage() {
                       Verify Vehicle
                     </MDBCardTitle>
                     <div className="input-wrapper mb-4">
+                      <label htmlFor="verificationCode" className="form-label">Verification Code</label>
+                      <MDBInput
+                        id="verificationCode" type="text" size="lg" value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                      />
+                    </div>
+                    <MDBBtn color="primary" className="verify-btn" onClick={handleVerifyEmail}>Verify Email</MDBBtn>
+                    <div className="input-wrapper mb-4">
                       <label htmlFor="vehicleNumber" className="form-label">Vehicle Number</label>
                       <MDBInput
                         id="vehicleNumber" type="text" size="lg" value={vehicleNumber}
@@ -729,6 +764,7 @@ function HomePage() {
                       />
                     </div>
                     <MDBBtn color="primary" className="verify-btn" onClick={handleVerifyVehicle}>Verify</MDBBtn>
+                    
                   </MDBCardBody>
                 </MDBCard>
               </MDBCol>
