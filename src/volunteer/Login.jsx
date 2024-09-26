@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MDBBtn, MDBCardBody, MDBIcon, MDBInput } from 'mdb-react-ui-kit';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 function Login() {
   const [loginType, setLoginType] = useState(null);
@@ -88,7 +88,11 @@ function Login() {
   };
 
   const handleBackClick = () => {
-    setLoginType(null); 
+    if (showSignupButtons) {
+      setShowSignupButtons(false); // Hide signup buttons and go back to login options
+    } else {
+      setLoginType(null); // Go back to login selection
+    }
   };
 
   return (
@@ -109,6 +113,9 @@ function Login() {
                 Signup as Service Requester
               </MDBBtn>
             </div>
+            <MDBBtn className="my-2" color="secondary" onClick={handleBackClick}>
+              Back
+            </MDBBtn>
             <div className="d-flex flex-column flex-md-row justify-content-center mt-3">
               <button className="small text-muted my-1 mx-2" style={{ background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
                 Terms of use
