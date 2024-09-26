@@ -11,7 +11,6 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
-  // Autofill fields if credentials are stored and login type is "lift"
   useEffect(() => {
     if (loginType === 'lift') {
       const storedEmail = localStorage.getItem('rememberedEmail');
@@ -89,7 +88,7 @@ function Login() {
   };
 
   const handleBackClick = () => {
-    setLoginType(null); // Reset loginType to null to go back to the original selection page
+    setLoginType(null); 
   };
 
   return (
@@ -102,17 +101,19 @@ function Login() {
 
         {showSignupButtons ? (
           <div className="my-4 text-center">
-            <MDBBtn className="me-lg-3 my-2" color="dark" onClick={() => handleSignupTypeSelect('volunteer')}>
-              Signup as Volunteer
-            </MDBBtn>
-            <MDBBtn className="me-lg-3 my-2" color="dark" onClick={() => handleSignupTypeSelect1('serviceRequester')}>
-              Signup as Service Requester
-            </MDBBtn>
-            <div className="d-flex flex-column flex-lg-row justify-content-center mt-3">
-              <button className="small text-muted me-lg-2 my-1" style={{ background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
+            <div className="d-flex flex-column flex-md-row justify-content-center align-items-center">
+              <MDBBtn className="my-2 mx-2" color="dark" onClick={() => handleSignupTypeSelect('volunteer')}>
+                Signup as Volunteer
+              </MDBBtn>
+              <MDBBtn className="my-2 mx-2" color="dark" onClick={() => handleSignupTypeSelect1('serviceRequester')}>
+                Signup as Service Requester
+              </MDBBtn>
+            </div>
+            <div className="d-flex flex-column flex-md-row justify-content-center mt-3">
+              <button className="small text-muted my-1 mx-2" style={{ background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
                 Terms of use
               </button>
-              <button className="small text-muted my-1" style={{ background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
+              <button className="small text-muted my-1 mx-2" style={{ background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
                 Privacy policy
               </button>
             </div>
@@ -121,10 +122,10 @@ function Login() {
           <>
             {loginType === null ? (
               <div className="my-4 text-center">
-                <MDBBtn className="me-lg-5 my-2" color="dark" onClick={() => handleLoginTypeSelect('volunteer')}>
+                <MDBBtn className="my-2 mx-2" color="dark" onClick={() => handleLoginTypeSelect('volunteer')}>
                   Login as Volunteer
                 </MDBBtn>
-                <MDBBtn className="my-2" color="dark" onClick={() => handleLoginTypeSelect('lift')}>
+                <MDBBtn className="my-2 mx-2" color="dark" onClick={() => handleLoginTypeSelect('lift')}>
                   Login to request a lift
                 </MDBBtn>
                 <p className="mb-5 mt-5 pb-lg-5" style={{ color: 'whitesmoke' }}>

@@ -15,7 +15,8 @@ function Signup() {
     lastName: '',
     emailId: '',
     password: '',
-    volunteer: signupType === 'volunteer'
+    volunteer: signupType === 'volunteer',
+    confirmPassword: '' // Ensure confirmPassword is included in formData
   });
 
   const navigate = useNavigate();
@@ -38,6 +39,10 @@ function Signup() {
       console.error('Error registering user:', error.response ? error.response.data : error.message);
       toast.error('Error in creating user');
     }
+  };
+
+  const handleBack = () => {
+    navigate(-1); // Navigate back to the previous page
   };
 
   return (
@@ -153,9 +158,14 @@ function Signup() {
                     required
                   />
                 </div>
-                <Button type="submit" className="text-center mt-4 w-100 w-lg-50 mx-auto" style={{ fontSize: '1.2rem' }}>
-                  Register
-                </Button>
+                <div className="d-flex justify-content-between mt-4">
+                  <Button type="button" className="w-100 me-2" onClick={handleBack}>
+                    Back
+                  </Button>
+                  <Button type="submit" className="text-center w-100 ms-2">
+                    Register
+                  </Button>
+                </div>
               </form>
             </MDBCardBody>
           </MDBCard>
