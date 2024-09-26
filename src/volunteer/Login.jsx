@@ -1,14 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MDBBtn, MDBCardBody, MDBIcon, MDBInput } from 'mdb-react-ui-kit';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from "jwt-decode"
+import {jwtDecode} from 'jwt-decode';
 
 function Login() {
   const [loginType, setLoginType] = useState(null);
   const [showSignupButtons, setShowSignupButtons] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+
+  // Autofill fields if credentials are stored and login type is "lift"
+  useEffect(() => {
+    if (loginType === 'lift') {
+      const storedEmail = localStorage.getItem('rememberedEmail');
+      const storedPassword = localStorage.getItem('rememberedPassword');
+      const storedRememberMe = localStorage.getItem('rememberMe') === 'true';
+
+      if (storedRememberMe) {
+        setEmail(storedEmail || '');
+        setPassword(storedPassword || '');
+        setRememberMe(storedRememberMe);
+      }
+    }
+  }, [loginType]);
 
   const handleLoginTypeSelect = (type) => {
     setLoginType(type);
@@ -28,8 +44,8 @@ function Login() {
 
   const handleLogin = async () => {
     try {
-      const apiUrl = loginType === 'volunteer' 
-        ? 'http://localhost:8888/api/login' 
+      const apiUrl = loginType === 'volunteer'
+        ? 'http://localhost:8888/api/login'
         : 'http://localhost:8888/api/custlogin';
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -40,18 +56,29 @@ function Login() {
       if (response.ok) {
         console.log("Login successful", data.token);
         localStorage.setItem('token', data.token);
-        if (loginType === 'volunteer') {
-          navigate('/home'); 
+
+        if (loginType === 'lift' && rememberMe) {
+          localStorage.setItem('rememberedEmail', email);
+          localStorage.setItem('rememberedPassword', password);
+          localStorage.setItem('rememberMe', true);
         } else {
-          const token = localStorage.getItem('token')
-          if(token) {
-            const decoded = jwtDecode(token)
-            console.log(decoded)
-            const decodedEmail = decoded.emailId
-            localStorage.setItem('emailId',decodedEmail)
-            console.log(decodedEmail)
+          localStorage.removeItem('rememberedEmail');
+          localStorage.removeItem('rememberedPassword');
+          localStorage.removeItem('rememberMe');
+        }
+
+        if (loginType === 'volunteer') {
+          navigate('/home');
+        } else {
+          const token = localStorage.getItem('token');
+          if (token) {
+            const decoded = jwtDecode(token);
+            console.log(decoded);
+            const decodedEmail = decoded.emailId;
+            localStorage.setItem('emailId', decodedEmail);
+            console.log(decodedEmail);
             navigate('/customerPage');
-            }
+          }
         }
       } else {
         console.log(data.msg);
@@ -59,6 +86,10 @@ function Login() {
     } catch (error) {
       console.log("Error logging in", error);
     }
+  };
+
+  const handleBackClick = () => {
+    setLoginType(null); // Reset loginType to null to go back to the original selection page
   };
 
   return (
@@ -118,6 +149,20 @@ function Login() {
                     <label htmlFor="password" className="form-label mt-2">Password</label>
                     <MDBInput id="password" type="password" size="lg" className="w-100 w-lg-50" value={password} onChange={(e) => setPassword(e.target.value)} />
                   </div>
+                  {loginType === 'lift' && (
+                    <div className="form-check mb-4">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="rememberMe"
+                        checked={rememberMe}
+                        onChange={() => setRememberMe(!rememberMe)}
+                      />
+                      <label className="form-check-label" htmlFor="rememberMe">
+                        Remember me
+                      </label>
+                    </div>
+                  )}
                   <div className="input-wrapper mb-4 text-center">
                     <button className="small" style={{ color: 'whitesmoke', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
                       Forgot password?
@@ -126,6 +171,9 @@ function Login() {
                 </div>
                 <MDBBtn className="mb-4 px-5" color="dark" size="lg" onClick={handleLogin}>
                   Login
+                </MDBBtn>
+                <MDBBtn className="mb-4 px-5" color="secondary" size="lg" onClick={handleBackClick}>
+                  Back
                 </MDBBtn>
 
                 <p className="mb-5 pb-lg-5 mt-lg-5" style={{ color: 'whitesmoke' }}>
