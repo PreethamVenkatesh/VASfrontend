@@ -120,7 +120,6 @@ function HomePage() {
         console.error('No token found');
         return;
       }
-  
       const availability = status === 'Available'; 
       const response = await axios.post('http://localhost:8888/api/update-availability', 
         { availability },
@@ -128,7 +127,6 @@ function HomePage() {
       );
   
       if (response.status === 200) {
-        console.log(response.data.msg);
         setAvailabilityStatus(status);
       } else {
         console.error('Failed to update availability:', response.data.msg); 
@@ -169,13 +167,11 @@ function HomePage() {
       },
     });
     const emailId = userResponse.data.emailId;
-    console.log("User's emailId is : " +emailId)
     const locationsResponse = await axios.get(`http://localhost:8888/api/locations/${emailId}`,{
       headers: {
         'Authorization': token,
       },
     });
-    console.log("Location Response is: ", locationsResponse.data);
     const confirmedBookings = locationsResponse.data.filter(
       booking => booking.bookingStatus === 'Confirmed' && booking.rideStatus === 'Not Started'
     );
@@ -206,13 +202,11 @@ function HomePage() {
       },
     });
     const emailId = userResponse.data.emailId;
-    console.log("User's emailId is : " +emailId)
     const locationsResponse = await axios.get(`http://localhost:8888/api/locations/${emailId}`,{
       headers: {
         'Authorization': token,
       },
     });
-    console.log("Location Response is: ", locationsResponse.data);
     const confirmedBookings = locationsResponse.data.filter(
       booking => booking.rideStatus === 'Completed'
     );
@@ -231,13 +225,11 @@ function HomePage() {
       },
     });
     const emailId = userResponse.data.emailId;
-    console.log("User's emailId is : " +emailId)
     const locationsResponse = await axios.get(`http://localhost:8888/api/locations/${emailId}`,{
       headers: {
         'Authorization': token,
       },
     });
-    console.log("Location Response is: ", locationsResponse.data);
     const confirmedBookings = locationsResponse.data.filter(
       booking => booking.bookingStatus === 'Pending'
     );
@@ -322,10 +314,13 @@ function HomePage() {
       });
       const relativePath = response.data.profilePicturePath;
       setProfileImage(relativePath);
-      alert('Profile picture uploaded successfully');
+      toast.success('Profile picture uploaded successfully');
+      setSelectedModule(null);
+      setShowProfileCard(true);
+      setShowAvailabilityButtons(true);
     } catch (error) {
       console.error('Error uploading profile picture:', error);
-      alert('Failed to upload profile picture');
+      toast.error('Error in uploading profile picture');
     }
   };
 
@@ -372,7 +367,6 @@ function HomePage() {
         }),
       ]);
       setDirectionsResponse([directionsToCustomer, directionsToDestination]);
-      console.log(location)
       setDestination(location);
       setModalOpen(true);
     } catch (error) {
@@ -401,8 +395,6 @@ function HomePage() {
           toast.error('Vehicle MOT status is not valid.');
           setVerificationSuccess(false);
         }
-        console.log('User Data:', user);
-        console.log('Vehicle Data:', vehicleData);
       } else {
         toast.error('Unexpected response status: ' + response.status);
       }
@@ -434,9 +426,6 @@ function HomePage() {
       const patientLong = directionsResponse[0].routes[0].legs[0].end_location.lng(); 
       const destLat = directionsResponse[1].routes[0].legs[0].end_location.lat(); 
       const destLng = directionsResponse[1].routes[0].legs[0].end_location.lng();
-  
-      // const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${destLat},${destLng}&waypoints=${patientLat},${patientLong}&travelmode=driving`;
-      // window.open(googleMapsUrl, '_blank');
       navigate('/navigation', { state: { startLat, startLng, patientLat, patientLong, destLat, destLng } });
     } else {
       toast.error("No directions available");

@@ -8,6 +8,17 @@ const containerStyle = {
   height: '100vh',
 };
 
+const overlayStyle = {
+  position: 'absolute',
+  top: '10px',
+  left: '10px',
+  backgroundColor: 'white',
+  padding: '10px',
+  borderRadius: '8px',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+  zIndex: '1000',
+};
+
 const Navigation = () => {
   const location = useLocation();
   const { startLat, startLng, patientLat, patientLong, destLat, destLng } = location.state;
@@ -15,6 +26,8 @@ const Navigation = () => {
   
   const [directions, setDirections] = useState(null);
   const [carPosition, setCarPosition] = useState({ lat: startLat, lng: startLng });
+  const [distance, setDistance] = useState('');
+  const [duration, setDuration] = useState('');
   const carRef = useRef(null);
 
   const carIcon = {
@@ -47,7 +60,19 @@ const Navigation = () => {
     directionsService.route(request, (result, status) => {
       if (status === 'OK') {
         setDirections(result);
-        animateCarAlongRoute(result.routes[0].overview_path); // Start animation
+
+        // Extract distance and duration from the directions response
+        const route = result.routes[0];
+        const leg = route.legs[0]; // For multi-leg trips, sum the legs if necessary
+        
+        // Convert distance to miles
+        const distanceInKm = leg.distance.value / 1000; // Google Maps returns distance in meters, converting to km
+        const distanceInMiles = (distanceInKm * 0.621371).toFixed(2); // Convert km to miles
+
+        setDistance(`${distanceInMiles} miles`);
+        setDuration(leg.duration.text);
+
+        animateCarAlongRoute(result.routes[0].overview_path);
       } else {
         console.error(`Directions request failed due to ${status}`);
       }
@@ -56,20 +81,20 @@ const Navigation = () => {
 
   const animateCarAlongRoute = (path) => {
     let index = 0;
-    const interval = 1000; // Update position every second
+    const interval = 3000; 
 
     const moveCar = () => {
       if (index < path.length) {
         const nextPosition = { lat: path[index].lat(), lng: path[index].lng() };
-        setCarPosition(nextPosition); // Update car's position
-        console.log('Car Position:', nextPosition); // Log the position
+        setCarPosition(nextPosition); 
+        console.log('Car Position:', nextPosition);
         index++;
       } else {
-        clearInterval(carRef.current); // Stop animation when route ends
+        clearInterval(carRef.current); 
       }
     };
 
-    carRef.current = setInterval(moveCar, interval); // Move car every second
+    carRef.current = setInterval(moveCar, interval); 
   };
 
   useEffect(() => {
@@ -89,24 +114,28 @@ const Navigation = () => {
   }
 
   return (
-    <GoogleMap
-      mapContainerStyle={containerStyle}
-      center={carPosition} // Center the map on the car position
-      zoom={10}
-    >
-      {directions && (
-        <DirectionsRenderer
-          directions={directions}
-          options={{ suppressMarkers: true }} // Suppress default markers
+    <div style={{ position: 'relative' }}>
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={carPosition}
+        zoom={15}
+      >
+        {directions && (
+          <DirectionsRenderer
+            directions={directions}
+            options={{ suppressMarkers: false }} 
+          />
+        )}
+        <Marker
+          position={carPosition} 
+          icon={carIcon} 
         />
-      )}
-      
-      {/* Car marker */}
-      <Marker
-        position={carPosition} // Car's current position
-        icon={carIcon} // Custom car icon
-      />
-    </GoogleMap>
+      </GoogleMap>
+      <div style={overlayStyle}>
+        <p><strong>Distance:</strong> {distance}</p>
+        <p><strong>Duration:</strong> {duration}</p>
+      </div>
+    </div>
   );
 };
 

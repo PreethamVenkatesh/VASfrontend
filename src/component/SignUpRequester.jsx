@@ -16,17 +16,55 @@ function SignUpRequester() {
     confirmPassword: ''
   });
 
+  const [errorMessage, setErrorMessage] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
+    if (id === 'phoneNumber') {
+      if (!/^\d*$/.test(value)) {
+        setPhoneError('Phone number must contain only digits.');
+        return;
+      }
+      if (value.length > 10) {
+        setPhoneError('Phone number cannot exceed 10 digits.');
+        return;
+      }
+      setPhoneError('');
+    }
+
     setFormData({ ...formData, [id]: value });
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    return passwordRegex.test(password);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const { password, confirmPassword, phoneNumber } = formData;
+    if (phoneNumber.length !== 10) {
+      setPhoneError('Phone number must be exactly 10 digits.');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setErrorMessage(
+        'Password must be at least 8 characters long, include one uppercase letter, one number, and one special character.'
+      );
+      return;
+    }
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match.');
+      return;
+    }
+    setErrorMessage('');
+
     try {
-      const response = await axios.post('http://localhost:8888/users', formData);
+      const response = await axios.post('http://localhost:8888/api/custregister', formData);
       console.log(response.data);
       toast.success('User signed up successfully');
       setTimeout(() => {
@@ -39,7 +77,7 @@ function SignUpRequester() {
   };
 
   const handleBack = () => {
-    navigate(-1); // Navigate back to the previous page
+    navigate(-1); 
   };
 
   return (
@@ -137,6 +175,11 @@ function SignUpRequester() {
                     required
                   />
                 </div>
+                {phoneError && (
+                  <div className="text-danger text-center mb-3">
+                    {phoneError}
+                  </div>
+                )}
                 <div className="input-wrapper mb-1 d-flex flex-column flex-lg-row align-items-center">
                   <label
                     htmlFor="password"
@@ -173,6 +216,11 @@ function SignUpRequester() {
                     required
                   />
                 </div>
+                {errorMessage && (
+                  <div className="text-danger text-center mb-3">
+                    {errorMessage}
+                  </div>
+                )}
                 <div className="d-flex justify-content-between mt-4">
                   <Button type="button" className="w-100 me-2" onClick={handleBack}>
                     Back
