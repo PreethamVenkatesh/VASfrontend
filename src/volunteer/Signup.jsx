@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import "./Style.css";
+import './Style.css';
 
 function Signup() {
   const location = useLocation();
@@ -16,9 +16,10 @@ function Signup() {
     emailId: '',
     password: '',
     volunteer: signupType === 'volunteer',
-    confirmPassword: '' // Ensure confirmPassword is included in formData
+    confirmPassword: '',
   });
 
+  const [errorMessage, setErrorMessage] = useState(''); 
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -26,8 +27,27 @@ function Signup() {
     setFormData({ ...formData, [id]: value });
   };
 
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const { password, confirmPassword } = formData;
+    if (!validatePassword(password)) {
+      setErrorMessage(
+        'Password must be at least 8 characters long, include one uppercase letter, one number, and one special character.'
+      );
+      return;
+    }
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match.');
+      return;
+    }
+    setErrorMessage('');
+
     try {
       const response = await axios.post('http://localhost:8888/api/signup', formData);
       console.log(response.data);
@@ -42,7 +62,7 @@ function Signup() {
   };
 
   const handleBack = () => {
-    navigate(-1); // Navigate back to the previous page
+    navigate(-1);
   };
 
   return (
@@ -58,9 +78,9 @@ function Signup() {
           <MDBCard
             className="w-100 w-lg-50 p-4"
             style={{
-              backgroundColor: "#fffdd0",
-              borderRadius: "15px",
-              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)"
+              backgroundColor: '#fffdd0',
+              borderRadius: '15px',
+              boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
             }}
           >
             <MDBCardBody>
@@ -158,6 +178,12 @@ function Signup() {
                     required
                   />
                 </div>
+                {errorMessage && (
+                  <div className="text-danger text-center mb-3">
+                    {errorMessage}
+                  </div>
+                )}
+
                 <div className="d-flex justify-content-between mt-4">
                   <Button type="button" className="w-100 me-2" onClick={handleBack}>
                     Back
