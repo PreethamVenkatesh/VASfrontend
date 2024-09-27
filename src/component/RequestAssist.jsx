@@ -3,6 +3,7 @@ import axios from 'axios';
 import { LoadScript, StandaloneSearchBox } from '@react-google-maps/api';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
+import { jwtDecode } from 'jwt-decode'
 
 const libraries = ['places'];
 
@@ -17,6 +18,7 @@ const RequestAssist = () => {
   const fromSearchBoxRef = useRef(null);
   const destinationSearchBoxRef = useRef(null);
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   const useCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -59,7 +61,11 @@ const RequestAssist = () => {
       setBookingError('Please enter valid location coordinates.');
       return;
     }
+    // console.log("decodedEmail-> "+decodedEmail)
+    
     try {
+      const decoded = jwtDecode(token);
+      const decodedEmail = decoded.emailId;
       const response = await axios.post('http://localhost:8888/api/userlocation', {
         custLocationLat: fromLatLng.lat,
         custLocationLong: fromLatLng.lng,
@@ -67,7 +73,12 @@ const RequestAssist = () => {
         time: new Date().toTimeString().split(' ')[0], 
         destinationLat: destinationLatLng.lat,
         destinationLong: destinationLatLng.lng,
+        customerEmailId:decodedEmail
       });
+      console.log(response)
+      console.log(decodedEmail)
+      localStorage.setItem('driver',response.data.allocatedVolunteer)
+      // localStorage.setItem('driver',"response.data.allocatedVolunteer")
 
       if (response.status === 201) {
         setIsBookingComplete(true);
