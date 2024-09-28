@@ -113,7 +113,7 @@ const MapRide = () => {
   }, []);
 
   const endJourney = () => {
-    navigate('/home');
+    navigate('/currentAssist');
   };
 
   if (loadError) {
@@ -145,6 +145,9 @@ const MapRide = () => {
       <div style={overlayStyle}>
         <p><strong>Distance:</strong> {distance}</p>
         <p><strong>Duration:</strong> {duration}</p>
+        <button style={buttonStyle} onClick={endJourney}>
+          Close Ride
+        </button>
       </div>
     </div>
   );
