@@ -6,8 +6,9 @@ import Modal from 'react-modal';
 
 function CurrentAssist() {
   const [bookingConfirmation, setBookingConfirmation] = useState('None');
+  const [bookingId, setBookingId] = useState('');
   const [volunteerName, setVolunteerName] = useState('');
-  const [ratings, setRatings] = useState('');
+  const [rating, setRating] = useState('');
   const [feedback, setFeedback] = useState('');
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -31,6 +32,8 @@ function CurrentAssist() {
       setErrorMessage("Volunteer or customer location is missing");
     }
   };
+
+  
 
   useEffect(() => {
     const fetchVolunteerStatus = async () => {
@@ -73,9 +76,11 @@ function CurrentAssist() {
           const response = await axios.get(`http://localhost:8888/api/booking-status/${customerEmailId}`);
     
           if (response.data && response.data.booking) {
-            const { bookingStatus, custLocationLat, custLocationLong, allocatedVolunteer } = response.data.booking;
+            const { _id, bookingStatus, custLocationLat, custLocationLong, allocatedVolunteer } = response.data.booking;
             setBookingConfirmation(bookingStatus);
             setCustomerLocation({ lat: custLocationLat, lng: custLocationLong });
+            setBookingId(_id);
+            localStorage.setItem('bookingId', _id);
             if (allocatedVolunteer) {
               console.log('Fetching location for volunteer:', allocatedVolunteer);
               await fetchVolunteerLocation(allocatedVolunteer); 
@@ -98,12 +103,12 @@ function CurrentAssist() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (ratings) {
+    if (rating) {
       try {
         const response = await axios.post('http://localhost:8888/api/currentassist', {
           bookingConfirmation,
           volunteerName,
-          ratings,
+          rating,
           feedback
         });
 
@@ -138,14 +143,15 @@ function CurrentAssist() {
   const closeModal = () => setIsModalOpen(false);
 
   const handleModalSubmit = async () => {
-    if (ratings) {
+    if (rating) {
       try {
-        const response = await axios.post('http://localhost:8888/api/currentassist/ratings', {
-          ratings,
+        const bookingId = localStorage.getItem('bookingId'); 
+        const response = await axios.post(`http://localhost:8888/api/booking/${bookingId}/rating`, {
+          rating,
           feedback
         });
-
-        if (response.status === 201) {
+  
+        if (response.status === 200) {
           setConfirmationMessage('Thank you for your feedback.');
           setErrorMessage('');
           closeModal();
@@ -230,13 +236,13 @@ function CurrentAssist() {
       >
         <h2 style={modalHeaderStyle}>Rate Your Ride</h2>
         <div style={formGroupStyle}>
-          <label htmlFor="ratings" style={labelStyle}>Post Completion Ratings:</label>
+          <label htmlFor="rating" style={labelStyle}>Post Completion Rating:</label>
           <input
             type="number"
-            id="ratings"
-            value={ratings}
-            onChange={(e) => setRatings(e.target.value)}
-            placeholder="Enter ratings (1-5)"
+            id="rating"
+            value={rating}
+            onChange={(e) => setRating(e.target.value)}
+            placeholder="Enter rating (1-5)"
             min="1"
             max="5"
             style={inputStyle}
