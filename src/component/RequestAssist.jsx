@@ -78,7 +78,6 @@ const RequestAssist = () => {
       console.log(response)
       console.log(decodedEmail)
       localStorage.setItem('driver',response.data.allocatedVolunteer)
-      // localStorage.setItem('driver',"response.data.allocatedVolunteer")
 
       if (response.status === 201) {
         setIsBookingComplete(true);
@@ -86,7 +85,7 @@ const RequestAssist = () => {
       }
     } catch (error) {
       console.error('Error booking the request:', error);
-      setBookingError('Error completing the booking. Please try again.');
+      setBookingError('No volunteers found nearby. Please try again.');
     }
   };
 

@@ -25,8 +25,8 @@ function CurrentAssist() {
           const response = await axios.get(`http://localhost:8888/api/verify-volunteer/${driverEmail}`);
 
           if (response.data && response.data.firstName) {
-
-            {response.data.bookingStatus === "Completed" ? 
+            console.log(response)
+            {response.data.status? // bookingstatus ? 
               setVolunteerName(response.data.firstName)
               : setVolunteerName("")
             }
@@ -65,6 +65,7 @@ function CurrentAssist() {
       } catch (error) {
         console.error('Error fetching booking status:', error);
         setBookingConfirmation('Error fetching booking status');
+
       }
     };
   
@@ -125,10 +126,10 @@ function CurrentAssist() {
   };
 
   const removeDriver = () => {
-    setTimeout(() => {
-      localStorage.removeItem('driver');
-      console.log('Driver data removed from localStorage after 10 minutes');
-    }, 600000); // 10 minutes
+    localStorage.removeItem('driver');
+    // setTimeout(() => {
+    //   console.log('Driver data removed from localStorage after 10 minutes');
+    // }, 600000); // 10 minutes
     navigate('/customerPage');
   };
 
@@ -151,7 +152,7 @@ function CurrentAssist() {
                 color:
                   bookingConfirmation === 'Pending'
                     ? 'orange'
-                    : bookingConfirmation === 'Completed'
+                    : bookingConfirmation === 'Confirmed'
                     ? 'green'
                     : 'gray',
               }}>
