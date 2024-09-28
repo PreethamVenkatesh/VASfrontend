@@ -156,6 +156,7 @@ function CurrentAssist() {
           setErrorMessage('');
           closeModal();
         }
+        localStorage.removeItem('bookingId');
       } catch (error) {
         setErrorMessage('Error submitting your feedback. Please try again.');
         console.error('Error:', error);
