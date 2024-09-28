@@ -34,23 +34,15 @@ function HomePage() {
   const [verificationCode, setVerificationCode] = useState('');
   const [emailId, setEmailId] = useState('');
   const navigate = useNavigate();
-  const [editableUser, setEditableUser] = useState({
-    firstName: '',
-    lastName: '',
-    emailId: '',
-  });
+  const [editableUser, setEditableUser] = useState({ firstName: '', lastName: '', emailId: '', });
   const { isLoaded } = useGoogleMaps(); // Use the custom hook
 
   const handleModuleClick = (module) => {
-    setSelectedModule(module);
-    setShowProfileCard(false);
-    setShowAvailabilityButtons(false);
+    setSelectedModule(module); setShowProfileCard(false); setShowAvailabilityButtons(false);
   };
 
   const handleBackClick = () => {
-    setSelectedModule(null);
-    setShowProfileCard(true);
-    setShowAvailabilityButtons(true);
+    setSelectedModule(null); setShowProfileCard(true); setShowAvailabilityButtons(true);
   };
 
   useEffect(() => {
@@ -66,13 +58,9 @@ function HomePage() {
           }
         });
         const relativePath = response.data.profilePicture;
-        setUser(response.data);
-        setProfileImage(relativePath);
-
+        setUser(response.data); setProfileImage(relativePath); 
         setEditableUser({
-          firstName: response.data.firstName,
-          lastName: response.data.lastName,
-          emailId: response.data.emailId,
+          firstName: response.data.firstName, lastName: response.data.lastName, emailId: response.data.emailId,
         });
       } catch (error) {
         console.error('Error fetching user details:', error);
@@ -99,18 +87,14 @@ function HomePage() {
             console.error("Error getting current location:", error);
           },
           {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
+            enableHighAccuracy: true, timeout: 10000, maximumAge: 0,
           }
         );
       } else {
         console.error('Geolocation is not supported by this browser.');
       }
     };
-    startTracking();
-    fetchUpcomingRides();
-    getStatusIndicator();
+    startTracking(); fetchUpcomingRides(); getStatusIndicator();
   }, [navigate]);
 
   const AvailabilityToggle = async (status) => {
@@ -141,9 +125,7 @@ function HomePage() {
       const token = localStorage.getItem('token');
       const { firstName, lastName, emailId} = editableUser;
       const dataToSend = {
-        firstName,
-        lastName,
-        emailId,
+        firstName, lastName, emailId,
       };
       const response = await axios.put('http://localhost:8888/api/update-profile', dataToSend, {
         headers: {
@@ -184,10 +166,8 @@ function HomePage() {
     const completedRides = locationsResponse.data.filter(
       (booking) => booking.rideStatus === 'Completed'
     );
-    setPendingRidesCount(pendingRides.length);
-    setConfirmedRidesCount(confirmedRides.length);
-    setCompletedRidesCount(completedRides.length);
-    setLocations(confirmedBookings);
+    setPendingRidesCount(pendingRides.length); setConfirmedRidesCount(confirmedRides.length);
+    setCompletedRidesCount(completedRides.length); setLocations(confirmedBookings);
     } catch (error) {
       console.error('Error fetching upcoming rides:', error);
     }
@@ -250,11 +230,7 @@ function HomePage() {
         },
       });
       toast.success('Booking accepted succesfully');
-      acceptPendingRides();
-      setSelectedModule(null);
-      setShowProfileCard(true);
-      setShowAvailabilityButtons(true);
-      fetchUpcomingRides();
+      acceptPendingRides(); setSelectedModule(null); setShowProfileCard(true); setShowAvailabilityButtons(true); fetchUpcomingRides();
     } catch (error) {
       console.error('Error accepting ride:', error);
     }
@@ -271,10 +247,7 @@ function HomePage() {
           },
         });
         toast.success('Ride completed succesfully');
-        fetchUpcomingRides();
-        setSelectedModule(null);
-        setShowProfileCard(true);
-        setShowAvailabilityButtons(true);
+        fetchUpcomingRides(); setSelectedModule(null); setShowProfileCard(true); setShowAvailabilityButtons(true);
     } catch (error) {
       console.error('Error updating ride status:', error.message);
     }
@@ -315,9 +288,7 @@ function HomePage() {
       const relativePath = response.data.profilePicturePath;
       setProfileImage(relativePath);
       toast.success('Profile picture uploaded successfully');
-      setSelectedModule(null);
-      setShowProfileCard(true);
-      setShowAvailabilityButtons(true);
+      setSelectedModule(null); setShowProfileCard(true); setShowAvailabilityButtons(true);
     } catch (error) {
       console.error('Error uploading profile picture:', error);
       toast.error('Error in uploading profile picture');
@@ -330,19 +301,16 @@ function HomePage() {
       const directionsRequestToCustomer = {
         origin: center,
         destination: {
-          lat: location.custLocationLat,
-          lng: location.custLocationLong
+          lat: location.custLocationLat, lng: location.custLocationLong
         },
         travelMode: window.google.maps.TravelMode.DRIVING,
       };
       const directionsRequestToDestination = {
         origin: {
-          lat: location.custLocationLat,
-          lng: location.custLocationLong,
+          lat: location.custLocationLat, lng: location.custLocationLong,
         },
         destination: {
-          lat: location.destinationLat,
-          lng: location.destinationLong,
+          lat: location.destinationLat, lng: location.destinationLong,
         },
         travelMode: window.google.maps.TravelMode.DRIVING,
       };
@@ -367,8 +335,7 @@ function HomePage() {
         }),
       ]);
       setDirectionsResponse([directionsToCustomer, directionsToDestination]);
-      setDestination(location);
-      setModalOpen(true);
+      setDestination(location); setModalOpen(true);
     } catch (error) {
       console.error('Error fetching directions:', error);
     }
@@ -389,11 +356,9 @@ function HomePage() {
       if (response.status === 200) {
         const { user, vehicleData } = response.data;
         if (vehicleData.motStatus === 'Valid') {
-          toast.success('Vehicle status verification successful');
-          setVerificationSuccess(true);
+          toast.success('Vehicle status verification successful'); setVerificationSuccess(true);
         } else {
-          toast.error('Vehicle MOT status is not valid.');
-          setVerificationSuccess(false);
+          toast.error('Vehicle MOT status is not valid.'); setVerificationSuccess(false);
         }
       } else {
         toast.error('Unexpected response status: ' + response.status);
@@ -442,10 +407,8 @@ function HomePage() {
     });
     const emailId = userResponse.data.emailId;
       const response = await axios.post('http://localhost:8888/api/verify-email', {
-        emailId,
-        verificationCode
+        emailId, verificationCode
       });
-      
       if (response.status === 200) {
         toast.success('Email verified successfully!');
       }
@@ -496,13 +459,9 @@ function HomePage() {
                 {getStatusIndicator()}
                 <MDBListGroup flush>
               {[
-                { name: 'Notification - Accept Rides', count: pendingRidesCount },
-                { name: 'Upcoming Rides', count: confirmedRidesCount},
-                { name: 'Past Rides - History', count: completedRidesCount },
-                { name: 'Profile Picture' },
-                { name: 'Update Profile' },
-                { name: 'Verify Vehicle' },
-                { name: 'Sign out' },
+                { name: 'Notification - Accept Rides', count: pendingRidesCount }, { name: 'Upcoming Rides', count: confirmedRidesCount},
+                { name: 'Past Rides - History', count: completedRidesCount }, { name: 'Profile Picture' },
+                { name: 'Update Profile' }, { name: 'Verify Vehicle' }, { name: 'Sign out' },
               ].map((module, index) => (
                 <MDBListGroupItem
                   key={module.name}
@@ -511,29 +470,15 @@ function HomePage() {
                     if (module.name === 'Sign out') {
                       handleSignOut();
                     } else if (module.name === 'Past Rides - History') {
-                      fetchCompletedRides();
-                      setSelectedModule(module.name);
-                      setShowProfileCard(false);
-                      setShowAvailabilityButtons(false);
+                      fetchCompletedRides(); setSelectedModule(module.name); setShowProfileCard(false); setShowAvailabilityButtons(false);
                     } else if (module.name === 'Notification - Accept Rides') {
-                      acceptPendingRides();
-                      setSelectedModule(module.name);
-                      setShowProfileCard(false);
-                      setShowAvailabilityButtons(false);
+                      acceptPendingRides(); setSelectedModule(module.name); setShowProfileCard(false); setShowAvailabilityButtons(false);
                     } else if (module.name === 'Upcoming Rides') {
-                      fetchUpcomingRides();
-                      setSelectedModule(module.name);
-                      setShowProfileCard(false);
-                      setShowAvailabilityButtons(false);
+                      fetchUpcomingRides(); setSelectedModule(module.name); setShowProfileCard(false); setShowAvailabilityButtons(false);
                     } else if (module.name === 'Verify Vehicle') {
-                      setVerifyVehicle(true);
-                      setSelectedModule(module.name);
-                      setShowProfileCard(false);
-                      setShowAvailabilityButtons(false);
+                      setVerifyVehicle(true); setSelectedModule(module.name); setShowProfileCard(false); setShowAvailabilityButtons(false);
                     } else {
-                      setSelectedModule(module.name);
-                      setShowProfileCard(false);
-                      setShowAvailabilityButtons(false);
+                      setSelectedModule(module.name); setShowProfileCard(false); setShowAvailabilityButtons(false);
                     }
                   }}
                   active={selectedModule === module.name}
@@ -542,12 +487,7 @@ function HomePage() {
                   {module.name === 'Notification - Accept Rides' && module.count > 0 && (
                     <span
                       style={{
-                        backgroundColor: 'red',
-                        color: 'white',
-                        borderRadius: '12px',
-                        padding: '3px 8px',
-                        marginLeft: '10px',
-                        fontSize: '0.9rem',
+                        backgroundColor: 'red', color: 'white', borderRadius: '12px', padding: '3px 8px', marginLeft: '10px', fontSize: '0.9rem',
                       }}
                     >
                       {module.count}
@@ -556,12 +496,7 @@ function HomePage() {
                   {module.name === 'Upcoming Rides' && module.count > 0 && (
                     <span
                       style={{
-                        backgroundColor: 'blue',
-                        color: 'white',
-                        borderRadius: '12px',
-                        padding: '3px 8px',
-                        marginLeft: '10px',
-                        fontSize: '0.9rem',
+                        backgroundColor: 'blue', color: 'white', borderRadius: '12px', padding: '3px 8px', marginLeft: '10px', fontSize: '0.9rem',
                       }}
                     >
                       {module.count}
@@ -570,12 +505,7 @@ function HomePage() {
                   {module.name === 'Past Rides - History' && module.count > 0 && (
                     <span
                       style={{
-                        backgroundColor: 'green',
-                        color: 'white',
-                        borderRadius: '12px',
-                        padding: '3px 8px',
-                        marginLeft: '10px',
-                        fontSize: '0.9rem',
+                        backgroundColor: 'green', color: 'white', borderRadius: '12px', padding: '3px 8px', marginLeft: '10px', fontSize: '0.9rem',
                       }}
                     >
                       {module.count}
@@ -777,10 +707,7 @@ function HomePage() {
     </MDBFooter>
 
     <Modal
-      isOpen={modalOpen}
-      onRequestClose={() => setModalOpen(false)}
-      contentLabel="Directions Modal"
-      className="directions-modal"
+      isOpen={modalOpen} onRequestClose={() => setModalOpen(false)} contentLabel="Directions Modal" className="directions-modal"
     >
       <button onClick={() => setModalOpen(false)} className="close-btn">&times;</button>
       <div className="modal-header">
