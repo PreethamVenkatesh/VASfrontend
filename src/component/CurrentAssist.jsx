@@ -12,7 +12,25 @@ function CurrentAssist() {
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [customerLocation, setCustomerLocation] = useState({ lat: null, lng: null });
+  const [allocatedVolunteer, setAllocatedVolunteer] = useState('');
+  const [volunteerLocation, setVolunteerLocation] = useState({ lat: null, lng: null });
   const navigate = useNavigate();
+
+  const handleStartNavigation = () => {
+    if (volunteerLocation.lat !== null && customerLocation.lat !== null) {
+      navigate('/mapRide', {
+        state: {
+          startLat: volunteerLocation.lat,
+          startLng: volunteerLocation.lng,
+          custLat: customerLocation.lat,
+          custLong: customerLocation.lng,
+        },
+      });
+    } else {
+      setErrorMessage("Volunteer or customer location is missing");
+    }
+  };
 
   useEffect(() => {
     const fetchVolunteerStatus = async () => {
@@ -50,12 +68,18 @@ function CurrentAssist() {
     const fetchBookingStatus = async () => {
       try {
         const customerEmailId = localStorage.getItem('emailId');
-  
+        
         if (customerEmailId) {
           const response = await axios.get(`http://localhost:8888/api/booking-status/${customerEmailId}`);
-          
-          if (response.data && response.data.bookingStatus) {
-            setBookingConfirmation(response.data.bookingStatus);
+    
+          if (response.data && response.data.booking) {
+            const { bookingStatus, custLocationLat, custLocationLong, allocatedVolunteer } = response.data.booking;
+            setBookingConfirmation(bookingStatus);
+            setCustomerLocation({ lat: custLocationLat, lng: custLocationLong });
+            if (allocatedVolunteer) {
+              console.log('Fetching location for volunteer:', allocatedVolunteer);
+              await fetchVolunteerLocation(allocatedVolunteer); 
+            }
           } else {
             setBookingConfirmation('No booking found');
           }
@@ -65,7 +89,6 @@ function CurrentAssist() {
       } catch (error) {
         console.error('Error fetching booking status:', error);
         setBookingConfirmation('Error fetching booking status');
-
       }
     };
   
@@ -94,10 +117,21 @@ function CurrentAssist() {
         console.error('Error:', error);
       }
     } 
-    // else {
-    //   setConfirmationMessage('');
-    //   setErrorMessage('Please fill in all required fields.');
-    // }
+  };
+
+  const fetchVolunteerLocation = async (volunteerEmail) => {
+    try {
+      const response = await axios.get(`http://localhost:8888/api/volunteer-location/${volunteerEmail}`);
+      
+      if (response.data) {
+        const { lat, lng } = response.data;
+        setVolunteerLocation({ lat, lng });
+      } else {
+        console.error('Volunteer location not found');
+      }
+    } catch (error) {
+      console.error('Error fetching volunteer location:', error);
+    }
   };
 
   const openModal = () => setIsModalOpen(true);
@@ -170,6 +204,7 @@ function CurrentAssist() {
               {volunteerName || "No Driver allocated yet"}
             </p>
           </div>
+          <button type="button" style={{ ...buttonStyle, marginTop: '10px' }} onClick={handleStartNavigation}> View Ride on Map</button>
 
           <button type="button" style={{ ...buttonStyle, marginTop: '10px' }} onClick={openModal}>
             Rate Your Ride

@@ -15,6 +15,7 @@ import CustomerAccount from './component/CustomerAccount';
 import Help from './component/Help';
 import FAQ from './component/FAQs';
 import Navigation from './volunteer/Navigation';
+import MapRide from './component/MapRide';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path='/help' element={<Help />} />
           <Route path='/faqs' element={<FAQ />} />
           <Route path="/navigation" element={<Navigation />} />
+          <Route path="/mapRide" element={<MapRide />} />
           <Route
             path="/home"
             element={
