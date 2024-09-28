@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { GoogleMap, DirectionsRenderer, Marker } from '@react-google-maps/api';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import useGoogleMaps from './GoogleMaps';
 
 const containerStyle = {
@@ -19,8 +19,19 @@ const overlayStyle = {
   zIndex: '1000',
 };
 
+const buttonStyle = {
+  backgroundColor: 'red', 
+  color: 'white',
+  padding: '10px 20px',
+  border: 'none',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  marginTop: '10px',
+};
+
 const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate(); 
   const { startLat, startLng, patientLat, patientLong, destLat, destLng } = location.state;
   const { isLoaded, loadError } = useGoogleMaps();
   
@@ -60,14 +71,10 @@ const Navigation = () => {
     directionsService.route(request, (result, status) => {
       if (status === 'OK') {
         setDirections(result);
-
-        // Extract distance and duration from the directions response
         const route = result.routes[0];
-        const leg = route.legs[0]; // For multi-leg trips, sum the legs if necessary
-        
-        // Convert distance to miles
-        const distanceInKm = leg.distance.value / 1000; // Google Maps returns distance in meters, converting to km
-        const distanceInMiles = (distanceInKm * 0.621371).toFixed(2); // Convert km to miles
+        const leg = route.legs[0]; 
+        const distanceInKm = leg.distance.value / 1000; 
+        const distanceInMiles = (distanceInKm * 0.621371).toFixed(2); 
 
         setDistance(`${distanceInMiles} miles`);
         setDuration(leg.duration.text);
@@ -105,6 +112,10 @@ const Navigation = () => {
     };
   }, []);
 
+  const endJourney = () => {
+    navigate('/home');  
+  };
+
   if (loadError) {
     return <div>Error loading Google Maps</div>;
   }
@@ -134,6 +145,13 @@ const Navigation = () => {
       <div style={overlayStyle}>
         <p><strong>Distance:</strong> {distance}</p>
         <p><strong>Duration:</strong> {duration}</p>
+      </div>
+      <div style={overlayStyle}>
+        <p><strong>Distance:</strong> {distance}</p>
+        <p><strong>Duration:</strong> {duration}</p>
+        <button style={buttonStyle} onClick={endJourney}>
+          End Journey
+        </button>
       </div>
     </div>
   );
