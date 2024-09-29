@@ -1,5 +1,6 @@
 import { useJsApiLoader } from "@react-google-maps/api";
 
+// Defining custom hook to load Google Maps API
 const useGoogleMaps = () => {
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",

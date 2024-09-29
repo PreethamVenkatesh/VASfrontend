@@ -10,7 +10,7 @@ import './Style.css';
 function Signup() {
   const location = useLocation();
   const signupType = location.state?.signupType;
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({ // Setting up the initial form data with state hooks
     firstName: '',
     lastName: '',
     emailId: '',
@@ -22,16 +22,19 @@ function Signup() {
   const [errorMessage, setErrorMessage] = useState(''); 
   const navigate = useNavigate();
 
+  // Function to handle input changes dynamically
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
   };
 
+  // Function to validate the passwor
   const validatePassword = (password) => {
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
     return passwordRegex.test(password);
   };
 
+  // Function to validate the passwor
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -49,6 +52,7 @@ function Signup() {
     setErrorMessage('');
 
     try {
+      // Sending a POST request to the signup API with form data
       const response = await axios.post('http://localhost:8888/api/signup', formData);
       console.log(response.data);
       toast.success('User signed up successfully');
@@ -61,6 +65,7 @@ function Signup() {
     }
   };
 
+  // Function to navigate back to the previous page
   const handleBack = () => {
     navigate(-1);
   };
@@ -69,6 +74,7 @@ function Signup() {
     <div>
       <MDBCardBody className="d-flex flex-column align-items-center" style={{ color: 'whitesmoke' }}>
         <div className="d-flex flex-column flex-lg-row align-items-center text-center text-lg-left">
+          {/* Header with icon and app name */}
           <MDBIcon fas icon="cubes fa-3x mb-3 mb-lg-0 me-lg-3" style={{ color: '#ff6219' }} />
           <span className="h1 fw-bold mb-0" style={{ fontSize: '3rem' }}>
             VAS LIFT ASSIST
@@ -88,6 +94,7 @@ function Signup() {
                 <h3>Create your account</h3>
               </div>
               <form onSubmit={handleSubmit}>
+                {/* First Name input */}
                 <div className="input-wrapper mb-1 d-flex flex-column flex-lg-row align-items-center">
                   <label
                     htmlFor="firstName"
@@ -106,6 +113,7 @@ function Signup() {
                     required
                   />
                 </div>
+                {/* Last Name input */}
                 <div className="input-wrapper mb-1 d-flex flex-column flex-lg-row align-items-center">
                   <label
                     htmlFor="lastName"
@@ -124,6 +132,7 @@ function Signup() {
                     required
                   />
                 </div>
+                {/* Email input */}
                 <div className="input-wrapper mb-1 d-flex flex-column flex-lg-row align-items-center">
                   <label
                     htmlFor="emailId"
@@ -142,6 +151,7 @@ function Signup() {
                     required
                   />
                 </div>
+                {/* Password input */}
                 <div className="input-wrapper mb-1 d-flex flex-column flex-lg-row align-items-center">
                   <label
                     htmlFor="password"
@@ -160,6 +170,7 @@ function Signup() {
                     required
                   />
                 </div>
+                {/* Confirm Password input */}
                 <div className="input-wrapper mb-1 d-flex flex-column flex-lg-row align-items-center">
                   <label
                     htmlFor="confirmPassword"
@@ -183,7 +194,7 @@ function Signup() {
                     {errorMessage}
                   </div>
                 )}
-
+                {/* Buttons for Back and Register */}
                 <div className="d-flex justify-content-between mt-4">
                   <Button type="button" className="w-100 me-2" onClick={handleBack}>
                     Back
