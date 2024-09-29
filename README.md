@@ -77,28 +77,16 @@ npm install
 - 'POST/api/upload-profile-picture': Upload profile picture
 - 'GET/api/completed-rides': Fetch completed rides
 
-## Folder Structure
-'''
-src/
-├── component/               # Contains reusable components
-│   ├── CurrentAssist.js     # Component for current assistance requests
-│   ├── FutureAssist.js      # Component for future assistance requests
-│   ├── Help.js              # Help section component
-│   ├── FAQs.js              # FAQ section component
-│   ├── MapRide.js           # Component for ride mapping
-│   ├── PastAssist.js        # Component for past assistance requests
-│   ├── RequestAssist.js      # Component for requesting assistance
-│   ├── SignUpRequester.js   # Component for user registration
-│   └── CustomerAccount.js    # Component for customer account management
-├── volunteer/               # Contains volunteer-related components
-│   ├── HomePage.js          # Volunteer home page component
-│   ├── Login.js             # Login component
-│   ├── Navigation.js        # Navigation component
-│   └── Signup.js            # Signup component
-├── App.js                   # Main application component
-├── App.css                  # Global styles
-└── index.js                 # Entry point of the application
-'''
+## Project Structure
+
+```
+VASBACKEND/
+├── backend/             # Backend API (Node.js, Express)
+├── frontend/            # Frontend Application (React.js)
+├── .env                 # Environment file
+├── README.md            # Project documentation
+└── package.json         # Project dependencies
+```
 
 ## Environment Variables
 Create a `.env` file in the `backend` directory and add the following:
