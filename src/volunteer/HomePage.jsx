@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MDBContainer, MDBCard, MDBCardBody, MDBCardTitle, MDBCol, MDBRow, MDBListGroup,
-  MDBListGroupItem, MDBFooter, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBInput } from 'mdb-react-ui-kit';
+  MDBListGroupItem, MDBFooter, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBInput, MDBIcon } from 'mdb-react-ui-kit';
 import axios from 'axios';
 import { GoogleMap, Marker, DirectionsRenderer } from "@react-google-maps/api"; // Import components for Google Maps
 import useGoogleMaps from './GoogleMaps';
 import Modal from 'react-modal'; 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import "./Style.css";
 
 Modal.setAppElement('#root');
@@ -600,13 +601,13 @@ function HomePage() {
               <MDBCol md="8" className="upcoming-rides-card">
                 <MDBCard className="h-100 mt-4 upcoming-rides-body">
                   <MDBCardBody>
-                    <MDBCardTitle>
-                      Past Rides - History
-                    </MDBCardTitle>
+                    <MDBCardTitle>Past Rides - History</MDBCardTitle>
                     <MDBTable striped>
                       <MDBTableHead>
                         <tr>
-                          <th>Date</th> <th>Time</th> <th>Rating</th>
+                          <th>Date</th>
+                          <th>Time</th>
+                          <th>Rating</th>
                         </tr>
                       </MDBTableHead>
                       <MDBTableBody>
@@ -614,6 +615,14 @@ function HomePage() {
                           <tr key={location._id}>
                             <td>{new Date(location.date).toISOString().split('T')[0]}</td>
                             <td>{location.time}</td>
+                            <td>
+                              {[...Array(location.rating)].map((_, index) => (
+                                <MDBIcon fas icon="star" key={index} style={{ color: 'red' }} />
+                              ))}
+                              {[...Array(5 - location.rating)].map((_, index) => (
+                                <MDBIcon fas icon="star" key={index + location.rating} style={{ color: 'lightgray' }} />
+                              ))}
+                            </td>
                           </tr>
                         ))}
                       </MDBTableBody>
@@ -622,6 +631,7 @@ function HomePage() {
                 </MDBCard>
               </MDBCol>
             )}
+
 
             {selectedModule === 'Update Profile' && (
               <MDBCol md="8" className="update-profile-card">
