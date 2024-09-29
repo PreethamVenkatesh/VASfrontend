@@ -1,4 +1,5 @@
 .demo{
+  /* Sets the background image, makes sure it's not repeated, covers the whole viewport height */
   background-image:url("../images/AMB_1.jpeg");
   background-repeat: no-repeat;
   background-size: cover;
@@ -6,242 +7,287 @@
 }
 
 .profile-img-container {
+  /* Centers the profile image within its container */
   display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 150px; 
-    width: 150px;  
-    margin-left: 25%;
-    overflow: hidden;
-    border-radius: 50%; 
-    border: 2px solid #ddd; 
-    background-color: fffdd0; 
-  }
+  justify-content: center;
+  align-items: center;
   
-  .profile-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-  }
+  /* Sets the dimensions of the container and aligns it with margins */
+  height: 150px; 
+  width: 150px;  
+  margin-left: 25%;
+  
+  /* Ensures the image doesn't overflow the container, makes it circular */
+  overflow: hidden;
+  border-radius: 50%; 
+  
+  /* Adds a border around the profile image and background color */
+  border: 2px solid #ddd; 
+  background-color: fffdd0; /* Light beige color */
+}
+  
+.profile-img {
+  /* Makes the profile image fit within the container */
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image doesn't distort */
+}
 
-  .status-indicator {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid white;
-    position: absolute;
-  }
-  
-  .status-indicator.active {
-    background-color: green;
-  }
-  
-  .status-indicator.inactive {
-    background-color: grey;
-  }
-  
-  .status-text {
-    font-size: 1.2rem;
-    color: black; 
-  }
+.status-indicator {
+  /* Small circle to show the user status (active/inactive) */
+  width: 20px;
+  height: 20px;
+  border-radius: 50%; /* Makes it circular */
+  border: 2px solid white;
+  position: absolute; /* Positioned relative to parent */
+}
 
-  .hidden {
-    display: none;
-  }
+.status-indicator.active {
+  /* Green background for active status */
+  background-color: green;
+}
   
+.status-indicator.inactive {
+  /* Grey background for inactive status */
+  background-color: grey;
+}
+
+.status-text {
+  /* Styling for the status label text */
+  font-size: 1.2rem;
+  color: black; 
+}
+
+.hidden {
+  /* CSS class to hide elements */
+  display: none;
+}
+  
+.availability-buttons {
+  /* Sets margin for the availability button container */
+  margin-top: 1%;
+  margin-left: 40%;
+}
+  
+.availability-btn {
+  /* Adds margin, padding, font size, and pointer cursor to buttons */
+  margin-right: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.available {
+  /* Green button style for when available */
+  background-color: lightgreen;
+  border: 2px solid green;
+}
+
+.unavailable {
+  /* Red button style for when unavailable */
+  background-color: lightcoral;
+  border: 2px solid darkred;
+}
+
+.profile-card {
+  /* Centers the profile card */
+  margin-left: 30%;
+  margin-top: 20px;
+}
+  
+.profile-card-body {
+  /* Sets a light beige background for the card body and adds margin */
+  background-color: #fffdd0 !important;
+  margin-top: 3%;
+}
+  
+/* Various cards for profile, rides, etc., all having consistent margins */
+.profile-picture-card,
+.upcoming-rides-card,
+.update-profile-card,
+.verify-vehicle-card,
+.current-location-card {
+  margin-left: 50px;
+  margin-top: 20px;
+}
+  
+/* Sets consistent styling for card bodies with a light beige background */
+.profile-picture-body,
+.upcoming-rides-body,
+.update-profile-body,
+.verify-vehicle-body,
+.current-location-body {
+  margin-top: 20px;
+  background-color: #fffdd0 !important;
+}
+
+.file-label {
+  /* Label styling for file uploads */
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.upload-btn {
+  /* Adds top margin to the upload button */
+  margin-top: 20px;
+}
+
+.input-wrapper {
+  /* Styles input field containers with column layout and spacing */
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.update-btn,
+.verify-btn {
+  /* Adds margin for the update and verify buttons */
+  margin-top: 20px;
+}
+
+.map-container,
+.modal-map-container {
+  /* Sets dimensions for map containers */
+  width: 100%;
+  height: 600px;
+}
+
+.directions-modal {
+  /* Styling for modal pop-up (directions) with padding and centered layout */
+  padding: 20px;
+  width: 90%;
+  height: 90%;
+  margin: auto;
+  background-color: #fffdd0; /* Light beige background */
+  position: relative;
+}
+
+.close-btn {
+  /* Close button styling in the modal */
+  font-size: 28px;
+  cursor: pointer;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  border: none;
+  background: none;
+  z-index: 1; /* Ensures it's on top of other elements */
+}
+
+.modal-header {
+  /* Modal header layout with space between elements */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.modal-title {
+  /* Modal title font size */
+  font-size: 24px;
+}
+
+.start-navigation-btn {
+  /* Navigation start button styling */
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.ReactModal__Overlay {
+  /* Semi-transparent overlay background for modal */
+  background-color: rgba(0, 0, 0, 0.5); 
+}
+
+@media (max-width: 900px) {
+  /* Responsive styles for screens narrower than 900px */
   .availability-buttons {
-    margin-top: 1%;
-    margin-left: 40%;
+    margin-left: 5%;
+    text-align: center;
   }
-  
+
   .availability-btn {
-    margin-right: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
+    /* Buttons stack vertically and take full width */
+    display: block;
+    width: 100%;
+    margin: 5px 0;
   }
-  
-  .available {
-    background-color: lightgreen;
-    border: 2px solid green;
-  }
-  
-  .unavailable {
-    background-color: lightcoral;
-    border: 2px solid darkred;
-  }
-  
+
   .profile-card {
+    /* Adjust card margin for smaller screens */
+    margin-left: 0;
+    margin-top: 15%;
+  }
+
+  .profile-img-container {
+    /* Adjust image container position */
     margin-left: 30%;
-    margin-top: 20px;
   }
-  
-  .profile-card-body {
-    background-color: #fffdd0 !important;
-    margin-top: 3%;
-  }
-    
+
+  /* Adjust margin for cards in smaller screens */
   .profile-picture-card,
   .upcoming-rides-card,
   .update-profile-card,
   .verify-vehicle-card,
   .current-location-card {
-    margin-left: 50px;
-    margin-top: 20px;
+    margin-left: 0;
+    margin-top: 10px;
   }
-  
+
+  /* Adjust card body styling for smaller screens */
   .profile-picture-body,
   .upcoming-rides-body,
   .update-profile-body,
   .verify-vehicle-body,
   .current-location-body {
-    margin-top: 20px;
-    background-color: #fffdd0 !important;
+    margin-top: 10px;
   }
-  
+
   .file-label {
-    font-size: 18px;
-    margin-bottom: 5px;
+    /* Smaller font for file label on smaller screens */
+    font-size: 16px;
   }
-  
-  .upload-btn {
-    margin-top: 20px;
-  }
-  
-  .input-wrapper {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-  }
-  
+
+  /* Adjust button sizes for smaller screens */
+  .upload-btn,
   .update-btn,
   .verify-btn {
-    margin-top: 20px;
+    width: 100%;
+    padding: 10px 0;
   }
-  
+
+  /* Adjust map container size for smaller screens */
   .map-container,
   .modal-map-container {
-    width: 100%;
-    height: 600px;
+    height: 550px;
   }
-  
+
+  .modal-header {
+    /* Modal header stacks vertically on smaller screens */
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .modal-title {
+    /* Smaller modal title font size */
+    font-size: 20px;
+  }
+
+  /* Adjust start button size for smaller screens */
+  .start-navigation-btn {
+    width: 70%;
+    padding: 5px;
+    font-size: 16px;
+  }
+
+  /* Adjust modal dimensions and layout for smaller screens */
   .directions-modal {
     padding: 20px;
     width: 90%;
-    height: 90%;
+    height: 80%;
     margin: auto;
-    background-color: #fffdd0; 
-    position: relative; 
+    background-color: #fffdd0;
+    position: relative;
+    margin-top: 30px;
   }
-  
-  .close-btn {
-    font-size: 28px;
-    cursor: pointer;
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    border: none;
-    background: none;
-    z-index: 1; 
-  }
-  
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-  }
-  
-  .modal-title {
-    font-size: 24px;
-  }
-  
-  .start-navigation-btn {
-    padding: 10px 20px;
-    font-size: 18px;
-    cursor: pointer;
-  }
-
-  .ReactModal__Overlay {
-    background-color: rgba(0, 0, 0, 0.5); 
-  }
-  
-  @media (max-width: 900px) {
-    .availability-buttons {
-      margin-left: 5%;
-      text-align: center;
-    }
-  
-    .availability-btn {
-      display: block;
-      width: 100%;
-      margin: 5px 0;
-    }
-  
-    .profile-card {
-      margin-left: 0;
-      margin-top: 15%;
-    }
-  
-    .profile-img-container {
-      margin-left: 30%;
-    }
-    
-    .profile-picture-card,
-    .upcoming-rides-card,
-    .update-profile-card,
-    .verify-vehicle-card,
-    .current-location-card {
-      margin-left: 0;
-      margin-top: 10px;
-    }
-  
-    .profile-picture-body,
-    .upcoming-rides-body,
-    .update-profile-body,
-    .verify-vehicle-body,
-    .current-location-body {
-      margin-top: 10px;
-    }
-  
-    .file-label {
-      font-size: 16px;
-    }
-  
-    .upload-btn,
-    .update-btn,
-    .verify-btn {
-      width: 100%;
-      padding: 10px 0;
-    }
-  
-    .map-container,
-    .modal-map-container {
-      height: 550px;
-    }
-  
-    .modal-header {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .modal-title {
-      font-size: 20px;
-    }
-  
-    .start-navigation-btn {
-      width: 70%;
-      padding: 5px;
-      font-size: 16px;
-    }
-
-    .directions-modal {
-      padding: 20px;
-      width: 90%;
-      height: 80%;
-      margin: auto;
-      background-color: #fffdd0; 
-      position: relative;
-      margin-top: 30px;
-    }
-  }
+}

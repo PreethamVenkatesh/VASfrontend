@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { MDBBtn, MDBCardBody, MDBIcon, MDBInput } from 'mdb-react-ui-kit';
+import { MDBBtn, MDBCardBody, MDBIcon, MDBInput } from 'mdb-react-ui-kit'; // Importing components from MDBReact UI Kit
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Importing jwtDecode to decode JWT tokens
 
+// Login frontend component
 function Login() {
   const [loginType, setLoginType] = useState(null);
   const [showSignupButtons, setShowSignupButtons] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // useNavigate hook for navigation between routes
 
+  // useEffect hook to populate remembered emailId and password if 'Remember me' was previously checked
   useEffect(() => {
     if (loginType === 'lift') {
       const storedEmail = localStorage.getItem('rememberedEmail');
@@ -23,25 +25,25 @@ function Login() {
         setRememberMe(storedRememberMe);
       }
     }
-  }, [loginType]);
+  }, [loginType]); // Re-run this effect whenever loginType changes
 
-  const handleLoginTypeSelect = (type) => {
+  const handleLoginTypeSelect = (type) => { // Function to handle login type selection
     setLoginType(type);
   };
 
-  const handleRegisterClick = () => {
+  const handleRegisterClick = () => { // Function to display signup buttons when 'Register' is clicked
     setShowSignupButtons(true);
   };
 
-  const handleSignupTypeSelect = (type) => {
-    navigate('/signup', { state: { signupType: type } });
+  const handleSignupTypeSelect = (type) => {  // Function to handle signup selection for 'Volunteer'
+    navigate('/signup', { state: { signupType: type } }); // Navigate to signup page for volunteers
   };
 
-  const handleSignupTypeSelect1 = (type) => {
-    navigate('/custregister', { state: { signupType: type } });
+  const handleSignupTypeSelect1 = (type) => { // Function to handle signup selection for 'Service Requester'
+    navigate('/custregister', { state: { signupType: type } }); // Navigate to signup page for customers
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async () => { // Function to handle login submission
     try {
       const apiUrl = loginType === 'volunteer'
         ? 'http://localhost:8888/api/login'
@@ -53,8 +55,7 @@ function Login() {
       });
       const data = await response.json();
       if (response.ok) {
-        console.log("Login successful", data.token);
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.token);  // Store token in localStorage
 
         if (loginType === 'lift' && rememberMe) {
           localStorage.setItem('rememberedEmail', email);
@@ -67,16 +68,14 @@ function Login() {
         }
 
         if (loginType === 'volunteer') {
-          navigate('/home');
+          navigate('/home');  // Navigate to home page for volunteers
         } else {
           const token = localStorage.getItem('token');
           if (token) {
-            const decoded = jwtDecode(token);
-            console.log(decoded);
+            const decoded = jwtDecode(token); // Decode the JWT token
             const decodedEmail = decoded.emailId;
-            localStorage.setItem('emailId', decodedEmail);
-            console.log(decodedEmail);
-            navigate('/customerPage');
+            localStorage.setItem('emailId', decodedEmail);  // Store decoded email in localStorage
+            navigate('/customerPage');  // Navigate to customer page
           }
         }
       } else {
@@ -87,11 +86,11 @@ function Login() {
     }
   };
 
-  const handleBackClick = () => {
+  const handleBackClick = () => { // Function to handle back button click
     if (showSignupButtons) {
-      setShowSignupButtons(false); // Hide signup buttons and go back to login options
+      setShowSignupButtons(false); 
     } else {
-      setLoginType(null); // Go back to login selection
+      setLoginType(null); 
     }
   };
 
@@ -103,6 +102,7 @@ function Login() {
           <span className="h1 fw-bold mb-0 mt-lg-5" style={{ fontSize: '3.5rem' }}>VAS LIFT ASSIST</span>
         </div>
 
+        {/* Conditionally render signup buttons if showSignupButtons is true */}
         {showSignupButtons ? (
           <div className="my-4 text-center">
             <div className="d-flex flex-column flex-md-row justify-content-center align-items-center">
@@ -127,6 +127,7 @@ function Login() {
           </div>
         ) : (
           <>
+            {/* If loginType is not selected, show login options */}
             {loginType === null ? (
               <div className="my-4 text-center">
                 <MDBBtn className="my-2 mx-2" color="dark" onClick={() => handleLoginTypeSelect('volunteer')}>

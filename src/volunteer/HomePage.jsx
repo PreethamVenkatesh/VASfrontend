@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MDBContainer, MDBCard, MDBCardBody, MDBCardTitle, MDBCol, MDBRow, MDBListGroup,
   MDBListGroupItem, MDBFooter, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBInput } from 'mdb-react-ui-kit';
 import axios from 'axios';
-import { GoogleMap, Marker, DirectionsRenderer } from "@react-google-maps/api";
+import { GoogleMap, Marker, DirectionsRenderer } from "@react-google-maps/api"; // Import components for Google Maps
 import useGoogleMaps from './GoogleMaps';
 import Modal from 'react-modal'; 
 import { ToastContainer, toast } from 'react-toastify';
