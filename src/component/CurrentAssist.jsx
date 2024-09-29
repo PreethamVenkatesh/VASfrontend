@@ -8,6 +8,7 @@ function CurrentAssist() {
   const [bookingConfirmation, setBookingConfirmation] = useState('None');
   const [bookingId, setBookingId] = useState('');
   const [volunteerName, setVolunteerName] = useState('');
+  const [volunteerEmail, setVolunteerEmail] = useState(''); // New state for volunteer email
   const [rating, setRating] = useState('');
   const [feedback, setFeedback] = useState('');
   const [confirmationMessage, setConfirmationMessage] = useState('');
@@ -45,6 +46,7 @@ function CurrentAssist() {
 
           if (response.data && response.data.firstName) {
             response.data.status ? setVolunteerName(response.data.firstName) : setVolunteerName("");
+            setVolunteerEmail(driverEmail);
           } else {
             setErrorMessage('Volunteer not found or no firstName available.');
           }
@@ -209,6 +211,18 @@ function CurrentAssist() {
               {volunteerName || "No Driver allocated yet"}
             </p>
           </div>
+
+          <div style={formGroupStyle}>
+            <label htmlFor="volunteerEmail" style={labelStyle}>Volunteer Email ID:</label>
+            <p
+              style={{
+                fontWeight: 'bold',
+                fontSize: '18px',
+              }}>
+              {volunteerEmail || "No Email available"}
+            </p>
+          </div>
+          
           <button type="button" style={{ ...buttonStyle, marginTop: '10px' }} onClick={handleStartNavigation}> View Ride on Map</button>
 
           <button type="button" style={{ ...buttonStyle, marginTop: '10px' }} onClick={openModal}>

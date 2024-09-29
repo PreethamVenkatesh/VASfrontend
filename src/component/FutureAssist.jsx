@@ -67,7 +67,7 @@ function FutureAssist() {
       setShowBookings(true);
     } catch (error) {
       console.error('Error fetching future bookings:', error);
-      setErrorMessage('Error fetching future bookings');
+      setErrorMessage('No Future Bookings done');
     }
   };
 
