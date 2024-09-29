@@ -33,7 +33,7 @@ Voluntary Ambulance Services(VAS) is a web application designed to facilitate tr
 ### Clone the repository
 ```bash
 git clone https://github.com/PreethamVenkatesh/VASfrontend.git
-cd vas-lift-assist-frontend
+cd VASFRONTEND
 ```
 #### Install dependencies
 - For Backend
@@ -78,7 +78,7 @@ npm install
 - 'GET/api/completed-rides': Fetch completed rides
 
 ## Folder Structure
-
+'''
 src/
 ├── component/               # Contains reusable components
 │   ├── CurrentAssist.js     # Component for current assistance requests
@@ -98,7 +98,7 @@ src/
 ├── App.js                   # Main application component
 ├── App.css                  # Global styles
 └── index.js                 # Entry point of the application
-
+'''
 
 ## Environment Variables
 Create a `.env` file in the `backend` directory and add the following:
