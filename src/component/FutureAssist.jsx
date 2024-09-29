@@ -10,11 +10,31 @@ function FutureAssist() {
   const [time, setTime] = useState('');
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [futureBookings, setFutureBookings] = useState([]);
+  const [showBookings, setShowBookings] = useState(false);
   const navigate = useNavigate();
+
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+
+  // Get the current time in HH:MM format
+  const currentTime = new Date();
+  const hours = currentTime.getHours().toString().padStart(2, '0');
+  const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+  const minTime = `${hours}:${minutes}`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate the booking time based on the date
+    const selectedDate = new Date(date);
+    const isToday = selectedDate.toISOString().split('T')[0] === today;
     
+    if (isToday && time < minTime) {
+      setErrorMessage('Time must be after the current time for today\'s bookings.');
+      return;
+    }
+
     if (fromLocation && destination && date && time) {
       try {
         const response = await axios.post('http://localhost:8888/api/futurelocation', {
@@ -40,14 +60,29 @@ function FutureAssist() {
     }
   };
 
+  const handleViewBookings = async () => {
+    try {
+      const response = await axios.get('http://localhost:8888/api/futurebookings');
+      setFutureBookings(response.data);
+      setShowBookings(true);
+    } catch (error) {
+      console.error('Error fetching future bookings:', error);
+      setErrorMessage('Error fetching future bookings');
+    }
+  };
+
+  const handleCloseBookings = () => {
+    setShowBookings(false);
+  };
+
   return (
     <div style={pageContainerStyle}> 
       <div style={containerStyle}>
-      <div
-        style={{position: 'absolute',left: '40px',top: '80px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
-        onClick={() => navigate('/customerPage')}>
-        <FaArrowLeft size={30} color="blue" />
-      </div>
+        <div
+          style={{position: 'absolute', left: '40px', top: '80px', cursor: 'pointer', display: 'flex', alignItems: 'center'}}
+          onClick={() => navigate('/customerPage')}>
+          <FaArrowLeft size={30} color="blue" />
+        </div>
         <h2 style={headerStyle}>Book Future Assistance</h2>
         <form onSubmit={handleSubmit} style={formStyle}>
           <div style={formGroupStyle}>
@@ -81,6 +116,7 @@ function FutureAssist() {
               id="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              min={today} // Set minimum date to today
               style={inputStyle}
             />
           </div>
@@ -92,6 +128,7 @@ function FutureAssist() {
               id="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
+              min={date === today ? minTime : "00:00"} // Set minimum time to current time if today
               style={inputStyle}
             />
           </div>
@@ -106,10 +143,28 @@ function FutureAssist() {
         {errorMessage && (
           <p style={errorStyle}>{errorMessage}</p>
         )}
+
+        <button onClick={handleViewBookings} style={buttonStyle}>View Future Bookings</button>
+
+        {showBookings && (
+          <div style={bookingsContainerStyle}>
+            <h3>Future Bookings:</h3>
+            <ul>
+              {futureBookings.map((booking, index) => (
+                <li key={index}>
+                  {booking.fromLocation} to {booking.destination} on {new Date(booking.date).toLocaleDateString()} at {booking.time}
+                </li>
+              ))}
+            </ul>
+            <button onClick={handleCloseBookings} style={closeButtonStyle}>Close</button>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
+// Styles (same as before)
 const pageContainerStyle = {
   minHeight: '100vh',
   display: 'flex',
@@ -127,7 +182,7 @@ const containerStyle = {
   backgroundSize: 'cover',
   borderRadius: '8px',
   maxWidth: '400px',
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 };
 
 const headerStyle = {
@@ -183,6 +238,24 @@ const errorStyle = {
   marginTop: '1.5rem',
   color: 'red',
   fontWeight: 'bold',
+};
+
+const bookingsContainerStyle = {
+  marginTop: '1.5rem',
+  padding: '1rem',
+  backgroundColor: 'lightblue',
+  borderRadius: '4px',
+  textAlign: 'left',
+};
+
+const closeButtonStyle = {
+  padding: '0.5rem 1rem',
+  backgroundColor: 'red',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  marginTop: '1rem',
 };
 
 export default FutureAssist;
