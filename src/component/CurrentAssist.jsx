@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
-import Modal from 'react-modal';
+// Importing necessary libraries and modules
+import React, { useState, useEffect } from 'react';// React hooks for managing state and side effects
+import axios from 'axios'; // Axios for making HTTP requests
+import { useNavigate } from 'react-router-dom'; // Navigation hook from React Router
+import { FaArrowLeft } from 'react-icons/fa'; // Icon library
+import Modal from 'react-modal'; // Modal component for pop-up forms
 
 function CurrentAssist() {
+   // State variables to manage various aspects of the component
   const [bookingConfirmation, setBookingConfirmation] = useState('None');
   const [bookingId, setBookingId] = useState('');
   const [volunteerName, setVolunteerName] = useState('');
-  const [volunteerEmail, setVolunteerEmail] = useState(''); // New state for volunteer email
+  const [volunteerEmail, setVolunteerEmail] = useState(''); 
   const [rating, setRating] = useState('');
   const [feedback, setFeedback] = useState('');
   const [confirmationMessage, setConfirmationMessage] = useState('');
@@ -17,11 +19,13 @@ function CurrentAssist() {
   const [customerLocation, setCustomerLocation] = useState({ lat: null, lng: null });
   const [allocatedVolunteer, setAllocatedVolunteer] = useState('');
   const [volunteerLocation, setVolunteerLocation] = useState({ lat: null, lng: null });
-  const [isRated, setIsRated] = useState(false);  // New state to track if ride is rated
+  const [isRated, setIsRated] = useState(false);  
   const navigate = useNavigate();
 
+  // Function to start navigation to mapRide page if both volunteer and customer locations are available
   const handleStartNavigation = () => {
     if (volunteerLocation.lat !== null && customerLocation.lat !== null) {
+      // Navigate to the mapRide page with both customer and volunteer locations
       navigate('/mapRide', {
         state: {
           startLat: volunteerLocation.lat,
@@ -35,16 +39,18 @@ function CurrentAssist() {
     }
   };
 
-  // Fetch volunteer details
+  // Fetch volunteer first name and email details
   useEffect(() => {
     const fetchVolunteerStatus = async () => {
       try {
         const driverEmail = localStorage.getItem('driver') || '';
 
         if (driverEmail) {
+          // Make a GET request to verify volunteer status using the driver's email
           const response = await axios.get(`http://localhost:8888/api/verify-volunteer/${driverEmail}`);
 
           if (response.data && response.data.firstName) {
+            // Set volunteer name and email if available
             response.data.status ? setVolunteerName(response.data.firstName) : setVolunteerName("");
             setVolunteerEmail(driverEmail);
           } else {
@@ -62,13 +68,14 @@ function CurrentAssist() {
     fetchVolunteerStatus();
   }, []);
 
-  // Fetch booking status and if the ride is already rated
+  // Fetch booking status and check if the ride is already rated
   useEffect(() => {
     const fetchBookingStatus = async () => {
       try {
         const customerEmailId = localStorage.getItem('emailId');
         
         if (customerEmailId) {
+          // Make a GET request to fetch booking status using customer email
           const response = await axios.get(`http://localhost:8888/api/booking-status/${customerEmailId}`);
     
           if (response.data && response.data.booking) {
@@ -76,11 +83,11 @@ function CurrentAssist() {
             setBookingConfirmation(bookingStatus);
             setCustomerLocation({ lat: custLocationLat, lng: custLocationLong });
             setBookingId(_id);
-            setIsRated(isRated); // Set isRated
+            setIsRated(isRated);
             localStorage.setItem('bookingId', _id);
 
             if (allocatedVolunteer) {
-              await fetchVolunteerLocation(allocatedVolunteer); 
+              await fetchVolunteerLocation(allocatedVolunteer);  // Fetch volunteer location if available
             }
           } else {
             setBookingConfirmation('No booking found');
@@ -97,11 +104,13 @@ function CurrentAssist() {
     fetchBookingStatus();
   }, []);
   
+  // Handle form submission to send ride feedback and rating
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (rating) {
       try {
+        // Post rating and feedback to the server
         const response = await axios.post('http://localhost:8888/api/currentassist', {
           bookingConfirmation,
           volunteerName,
@@ -110,6 +119,7 @@ function CurrentAssist() {
         });
 
         if (response.status === 201) {
+          // Display success message if submission is successful
           setConfirmationMessage('Your details have been successfully submitted.');
           setErrorMessage('');
         }
@@ -121,11 +131,13 @@ function CurrentAssist() {
     } 
   };
 
+  // Fetch the volunteer's current location based on their email
   const fetchVolunteerLocation = async (volunteerEmail) => {
     try {
       const response = await axios.get(`http://localhost:8888/api/volunteer-location/${volunteerEmail}`);
       
       if (response.data) {
+        // Set volunteer location if available
         const { lat, lng } = response.data;
         setVolunteerLocation({ lat, lng });
       } else {
@@ -136,11 +148,14 @@ function CurrentAssist() {
     }
   };
 
+  // Functions to open and close the modal for rating submission
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
+   // Handle rating and feedback submission from the modal
   const handleModalSubmit = async () => {
     if (isRated) {
+      // Prevent multiple ratings if the ride has already been rated
       setErrorMessage('You have already rated this ride.');  // Prevent multiple ratings
       return;
     }
@@ -154,9 +169,10 @@ function CurrentAssist() {
         });
   
         if (response.status === 200) {
+          // Display confirmation message and mark ride as rated
           setConfirmationMessage('Thank you for your feedback.');
           setErrorMessage('');
-          setIsRated(true);  // Mark as rated after successful submission
+          setIsRated(true); 
           closeModal();
         }
         localStorage.removeItem('bookingId');
@@ -169,13 +185,16 @@ function CurrentAssist() {
     }
   };
 
+    // Function to remove the volunteer from localStorage and navigate back to customer page
   const removeDriver = () => {
     localStorage.removeItem('driver');
     navigate('/customerPage');
   };
 
+   // JSX structure for the component's UI
   return (
     <div style={containerStyle}>
+      {/* Back button to navigate to customer page */}
       <div
         style={{ position: 'absolute', left: '5px', top: '50px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         onClick={() => navigate('/customerPage')}>
@@ -183,6 +202,8 @@ function CurrentAssist() {
       </div>
       <div style={formContainerStyle}>
         <h2 style={headerStyle}>Current Assistance</h2>
+
+        {/* Booking status and feedback form */}
         <form onSubmit={handleSubmit} style={formStyle}>
           <div style={formGroupStyle}>
             <label style={labelStyle}>Booking Confirmation:</label>
@@ -201,6 +222,7 @@ function CurrentAssist() {
             </p>
           </div>
 
+           {/* Volunteer details */}
           <div style={formGroupStyle}>
             <label htmlFor="volunteerName" style={labelStyle}>Volunteer Allocated Name:</label>
             <p
@@ -222,7 +244,8 @@ function CurrentAssist() {
               {volunteerEmail || "No Email available"}
             </p>
           </div>
-          
+
+          {/* Buttons for viewing ride on the map, opening the modal for rating, and closing the ride */}
           <button type="button" style={{ ...buttonStyle, marginTop: '10px' }} onClick={handleStartNavigation}> View Ride on Map</button>
 
           <button type="button" style={{ ...buttonStyle, marginTop: '10px' }} onClick={openModal}>
@@ -231,6 +254,7 @@ function CurrentAssist() {
           <button type="submit" style={buttonStyle} onClick={()=>removeDriver()}>Close the Ride</button>
         </form>
 
+        {/* Success or error messages */}
         {confirmationMessage && (
           <p style={confirmationStyle}>{confirmationMessage}</p>
         )}
@@ -239,7 +263,7 @@ function CurrentAssist() {
           <p style={errorStyle}>{errorMessage}</p>
         )}
       </div>
-
+      {/* Modal for rating the ride */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
@@ -248,6 +272,7 @@ function CurrentAssist() {
         ariaHideApp={false}
       >
         <h2 style={modalHeaderStyle}>Rate Your Ride</h2>
+        {/* Rating and feedback input fields */}
         <div style={formGroupStyle}>
           <label htmlFor="rating" style={labelStyle}>Post Completion Rating:</label>
           <div>
@@ -276,7 +301,8 @@ function CurrentAssist() {
             style={{ ...inputStyle, resize: 'vertical' }}
           />
         </div>
-
+        
+        {/* Modal buttons for submitting feedback or closing modal */}
         <button onClick={handleModalSubmit} style={buttonStyle}>Submit</button>
         <button onClick={closeModal} style={{ ...buttonStyle, backgroundColor: 'red', marginLeft: '10px' }}>Close</button>
       </Modal>
@@ -284,6 +310,7 @@ function CurrentAssist() {
   );
 }
 
+// CSS styles for the component
 const containerStyle = {
   display: 'flex',
   justifyContent: 'center',

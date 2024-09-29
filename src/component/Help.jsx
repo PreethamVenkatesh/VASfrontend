@@ -1,46 +1,54 @@
+// Importing necessary libraries and modules
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 
 function Help() {
+  // Link to the Google Drive video for navigation help
   const googleDriveVideoLink = 'https://drive.google.com/file/d/1a6MCYeJq06C1PrMmSEq0R4eSvHeFtWnT/preview';
   const navigate = useNavigate();
   return (
     <div style={containerStyle}>
+      {/* Back button to navigate to the customer page */}
       <div
         style={{position: 'absolute',left: '80px',top: '30px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
-        onClick={() => navigate('/customerPage')}>
+        onClick={() => navigate('/customerPage')}// Navigate back on click
+        >
         <FaArrowLeft size={30} color="blue" />
       </div>
+      {/* Help page header */}
       <h1 style={headerStyle}>Help</h1>
       <div style={formContainerStyle}>
         <form style={formStyle}>
+          {/* Helpline Number Input */}
           <div style={formGroupStyle}>
             <label htmlFor="helplineNumber" style={labelStyle}>Helpline Number</label>
             <input
               type="text"
               id="helplineNumber"
               value="+447435011781"
-              readOnly
+              readOnly // Makes the input field non-editable
               style={inputStyle}
             />
           </div>
 
+          {/* Email ID Input */}
           <div style={formGroupStyle}>
             <label htmlFor="emailID" style={labelStyle}>Email ID</label>
             <input
               type="text"
               id="emailID"
-              value="volambulance@gmail.com"
+              value="vasliftassist@gmail.com"
               readOnly
               style={inputStyle}
             />
           </div>
 
+          {/* Video Player for Navigation Help */}
           <div style={videoContainerStyle}>
             <label htmlFor="videoPlayer" style={labelStyle}>Navigation Help Video</label>
             <iframe
-              src={googleDriveVideoLink}
+              src={googleDriveVideoLink}  // Source link for the video
               title="Navigation Help Video"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -53,6 +61,7 @@ function Help() {
   );
 }
 
+// Styles for the Help component
 const containerStyle = {
   backgroundColor: 'yellow',
   height: '100vh',
@@ -118,4 +127,4 @@ const iframeStyle = {
   border: 'Black',
 };
 
-export default Help;
+export default Help; // Exporting the Help component

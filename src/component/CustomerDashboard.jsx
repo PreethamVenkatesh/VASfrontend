@@ -1,6 +1,9 @@
+// Importing necessary libraries and modules
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { NavLink } from 'react-router-dom';
+// Importing images for display on the dashboard
 import PA from '../images/PastAssists.png';
 import RA from '../images/Request Assistance.jpeg';
 import AI from '../images/Assistance Inprogress.jpeg';
@@ -8,11 +11,12 @@ import FA from '../images/BookFutureAssists.jpeg';
 import HelpImage from '../images/Help.jpeg';  
 import FaqsImage from '../images/FAQs.jpeg';  
 import AccountImage from '../images/UserAccount.jpeg' 
-import { NavLink } from 'react-router-dom';
+
 
 function CustomerDashboard() {
   return (
     <div style={{ backgroundColor: 'yellow', minHeight: '100vh' }}>
+      {/* Account link at the top right corner */}
       <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
         <NavLink to={'/account'} style={{ textDecoration: 'none' }}>
           <img 
@@ -24,7 +28,8 @@ function CustomerDashboard() {
           <span style={{ color: 'blue', fontWeight: 'bolder', fontSize: '18px'}}>Account</span>
         </NavLink>
       </div>
-
+      
+      {/* Dashboard title */}
       <div 
         style={{ 
           fontSize: '40px', 
@@ -39,6 +44,7 @@ function CustomerDashboard() {
         Dashboard
       </div>
 
+      {/* Main content area for the dashboard */}
       <div>
         <Row
           style={{
@@ -49,6 +55,7 @@ function CustomerDashboard() {
             textAlign: 'center',
           }}
         >
+          {/* Past Assistance Section */}
           <Col  
             xs={12} sm={6} md={3}
             style={{
@@ -74,6 +81,7 @@ function CustomerDashboard() {
             </NavLink>
           </Col>
 
+          {/* Request Assistance Section and Current Assistance Section */}
           <Col  
             xs={12} sm={4} md={6}
             style={{
@@ -116,6 +124,7 @@ function CustomerDashboard() {
             </NavLink>
           </Col>
 
+          {/* Book Future Assistance Section */}
           <Col  
             xs={12} sm={6} md={3}
             style={{
@@ -142,6 +151,7 @@ function CustomerDashboard() {
           </Col>
         </Row>
 
+        {/* Help and FAQs Section */}
         <div
           style={{
             display: 'flex',

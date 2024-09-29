@@ -1,3 +1,4 @@
+// Importing necessary libraries and modules
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Card from 'react-bootstrap/Card';
@@ -17,13 +18,18 @@ import CustWork from './Modals/CustWork';
 import { FaArrowLeft } from 'react-icons/fa';
 
 function CustomerAccount() {
+    // Get the JWT token from local storage
   const token = localStorage.getItem('token');
+
+  // State for user data
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
     emailId: '',
     phoneNumber: '',
   });
+
+  // State to manage edit mode for each field
   const [editMode, setEditMode] = useState({
     firstName: false,
     lastName: false,
@@ -31,19 +37,23 @@ function CustomerAccount() {
     phoneNumber: false,
   });
 
+  // Handle changes to user input
   const editUser = (event) => {
     const { name, value } = event.target;
     setUserData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+    // State for profile picture
   const [profilePic, setProfilePic] = useState(ProfImg)
 
+  // Toggle edit mode for a specific field
   const toggleEditMode = (field) => {
     setEditMode((prevEditMode) => ({
       ...prevEditMode,
       [field]: !prevEditMode[field],
     }));
   
+    // If exiting edit mode, update the user data
     if (editMode[field]) {
       const updatedUser = {
         firstName: userData.firstName,
@@ -51,10 +61,12 @@ function CustomerAccount() {
         emailId: userData.emailId,
         phoneNumber: userData.phoneNumber,
       };
-  
+      
+      // Decode token to get email ID for the PUT request
       const decoded = jwtDecode(token);
       const decodedEmail = decoded.emailId;
   
+      // Update user information via API
       axios
         .put(`http://localhost:8888/api/custupdate`, { emailId: decodedEmail, ...updatedUser })
         .then((res) => {
@@ -66,6 +78,7 @@ function CustomerAccount() {
     }
   };
   
+  // Handle profile picture change
   const handleProfilePicChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -77,13 +90,16 @@ function CustomerAccount() {
     }
   };
 
-const navigate  = useNavigate();
+  // Hook for navigation
+  const navigate  = useNavigate();
 
+  // Handle sign out action
   const handleSignOut = () => {
     localStorage.clear();
   navigate('/')
   };
 
+  // Fetch user details from the server
   const fetchUserDetails = () => {
     if (token) {
       const decoded = jwtDecode(token);
@@ -111,6 +127,7 @@ const navigate  = useNavigate();
 
   return (
     <div style={{minHeight: '100vh', backgroundColor: 'yellow',padding: '20px'}}>
+      {/* Back button to navigate to the previous page */}
       <div
         style={{position: 'absolute',left: '60px',top: '30px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
         onClick={() => navigate('/customerPage')}>
@@ -122,6 +139,7 @@ const navigate  = useNavigate();
       <Row>
         <Col style={{ marginLeft: '10%', marginTop: '5%' }}>
           <Card style={{ width: '20rem' }}>
+            {/* Profile picture section */}
           <div style={{ height: '200px', width: '100%', position: 'relative' }}>
               <img
                 src={profilePic}
@@ -162,6 +180,7 @@ const navigate  = useNavigate();
             </Card.Body>
             {userData && (
               <ListGroup className="list-group-flush">
+                {/* User data fields with edit functionality */}
                 <ListGroup.Item>
                   <b>First Name </b>
                   <FontAwesomeIcon
@@ -255,10 +274,10 @@ const navigate  = useNavigate();
                   <b>Settings</b>
                 </Card.Title>
               </div>
-              <CustHome />
-              <CustWork />
+              <CustHome /> {/* Custom Home settings modal */}
+              <CustWork /> {/* Custom Work settings modal */}
               <Button variant="danger" onClick={handleSignOut}>
-                Sign Out
+                Sign Out {/* Sign out button */}
               </Button>
             </Card.Body>
           </Card>

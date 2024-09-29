@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
-import axios from 'axios';
+import axios from 'axios';// Axios for making HTTP requests
 
 function PastAssist() {
   const navigate = useNavigate();
-  const [pastAssists, setPastAssists] = useState([]);
-  const [volunteerNames, setVolunteerNames] = useState({}); // Store volunteer names with booking ID
+  const [pastAssists, setPastAssists] = useState([]);// State to store the list of past assists
+  const [volunteerNames, setVolunteerNames] = useState({}); // State to store volunteer names associated with each ride
   const [rebookMessage, setRebookMessage] = useState('');
 
+   // useEffect to fetch the completed rides
   useEffect(() => {
     const fetchCompletedRides = async () => {
       try {
+        // Fetching completed rides data from the API
         const response = await fetch('http://localhost:8888/api/completed-rides');
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -35,15 +37,18 @@ function PastAssist() {
     fetchCompletedRides();
   }, []);
 
+  // Function to fetch volunteer names based on their emails
   const fetchVolunteerNames = async (data) => {
     const volunteerEmails = [...new Set(data.map(assist => assist.allocatedVolunteer))]; // Get unique emails
 
     try {
+      // Fetch volunteer name
       const responses = await Promise.all(volunteerEmails.map(email => axios.get(`http://localhost:8888/api/verify-volunteer/${email}`)));
       const names = {};
+      // Mapping the responses to store names with their respective emails
       responses.forEach((response, index) => {
         if (response.data && response.data.firstName) {
-          names[volunteerEmails[index]] = response.data.firstName; // Store name with email
+          names[volunteerEmails[index]] = response.data.firstName; //Store volunteer's first name with their email as key
         }
       });
       setVolunteerNames(names);
@@ -52,6 +57,7 @@ function PastAssist() {
     }
   };
 
+    // Function to handle rebooking based on the index of the assist
   const handleRebook = (index) => {
     const destination = pastAssists[index].destination;
     setRebookMessage(`Rebooking completed.`);
@@ -64,6 +70,7 @@ function PastAssist() {
       minHeight: '100vh',
       padding: '20px',
     }}>
+      {/* Back button to navigate back to the customer page */}
       <div
         style={{
           position: 'absolute',
@@ -76,6 +83,7 @@ function PastAssist() {
         onClick={() => navigate('/customerPage')}>
         <FaArrowLeft size={30} color="blue" />
       </div>
+      {/* Page Title */}
       <h2 style={{
         color: 'blue',
         marginBottom: '1.5rem',
@@ -86,6 +94,7 @@ function PastAssist() {
         Past <br />Assistance
       </h2>
 
+       {/* Rendering the list of past assists */}
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
         {pastAssists.map((assist, index) => (
           <div key={index} style={cardStyle}>
@@ -119,13 +128,14 @@ function PastAssist() {
   );
 }
 
+// Card style for the assist items
 const cardStyle = {
   backgroundColor: '#444',
   color: 'white',
   borderRadius: '8px',
   padding: '15px',
   margin: '10px',
-  flex: '1 1 calc(45% - 20px)', // 2 cards per row with some margin
+  flex: '1 1 calc(45% - 20px)', 
   boxSizing: 'border-box',
 };
 
@@ -135,7 +145,7 @@ const cardContentStyle = {
 
 const textStyle = {
   margin: '5px 0',
-  fontSize: '16px', // Increased font size for text
+  fontSize: '16px',
 };
 
-export default PastAssist;
+export default PastAssist; // Export the component

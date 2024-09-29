@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // Importing useNavigate for navigation
+import { FaArrowLeft } from 'react-icons/fa'; // Importing an icon for the back button
 
 function FAQs() {
+  // State to track which FAQ is currently open
   const [openIndex, setOpenIndex] = useState(null);
   const navigate = useNavigate();
 
+   // Array of FAQ objects containing questions and answers
   const faqs = [
     {
       question: "How do I request an ambulance using the app?",
@@ -79,17 +81,20 @@ function FAQs() {
     },
   ];
 
+  // Function to toggle the visibility of FAQ answers
   const toggleFAQ = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
+    setOpenIndex(openIndex === index ? null : index); // Open the clicked FAQ or close it if it's already open
   };
 
   return (
     <div style={{ padding: '20px', backgroundColor: 'yellow' }}>
+      {/* Back button to navigate to the customer page */}
       <div
         style={{position: 'absolute',left: '80px',top: '30px',cursor: 'pointer',display: 'flex',alignItems: 'center'}}
         onClick={() => navigate('/customerPage')}>
-        <FaArrowLeft size={30} color="blue" />
+        <FaArrowLeft size={30} color="blue" /> {/* Back arrow icon */}
       </div>
+      {/* Title for the FAQs section */}
       <h1 style={{ color: 'blue', fontWeight: 'bold',textDecoration: 'underline',fontSize: '40px'}}>FAQs</h1>
       <div style={{ maxWidth: '800px', margin: 'auto' , fontSize: '25px'}}>
         {faqs.map((faq, index) => (
@@ -103,6 +108,7 @@ function FAQs() {
               overflow: 'hidden',
             }}
           >
+             {/* Clickable question header */}
             <div
               onClick={() => toggleFAQ(index)}
               style={{
@@ -113,11 +119,12 @@ function FAQs() {
                 color: openIndex === index ? '#333' : 'blue',
               }}
             >
-              {faq.question}
+              {faq.question} {/* Display the question */}
             </div>
+            {/* Conditional display of the answer */}
             {openIndex === index && (
               <div style={{ padding: '15px', backgroundColor: '#f9f9f9', color: '#555' }}>
-                {faq.answer}
+                {faq.answer} {/* Display the answer */}
               </div>
             )}
           </div>
@@ -127,4 +134,4 @@ function FAQs() {
   );
 }
 
-export default FAQs;
+export default FAQs; // Exporting the FAQs component

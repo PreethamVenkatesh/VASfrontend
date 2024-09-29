@@ -1,11 +1,13 @@
 import React from 'react';
+//Imported components from the 'volunteer' folder
 import Login from './volunteer/Login';
 import Signup from './volunteer/Signup';
 import HomePage from './volunteer/HomePage';
 import Security from './volunteer/Security';
-import CustomerDashboard from './component/CustomerDashboard';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
+//Imported components from the 'component' folder
+import CustomerDashboard from './component/CustomerDashboard';
 import SignUpRequester from './component/SignUpRequester';
 import PastAssist from './component/PastAssist';
 import RequestAssist from './component/RequestAssist';
@@ -19,9 +21,10 @@ import MapRide from './component/MapRide';
 
 function App() {
   return (
-    <Router>
+    <Router> {/* Wrap the application in the Router component to enable routing */}
       <div className="App">
-        <Routes>
+        <Routes> {/* Define the routes for different parts of the application */}
+          {/* Each Route defines a specific path and the component that should render at that path */}
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/custregister" element={<SignUpRequester />} />
@@ -34,6 +37,8 @@ function App() {
           <Route path='/faqs' element={<FAQ />} />
           <Route path="/navigation" element={<Navigation />} />
           <Route path="/mapRide" element={<MapRide />} />
+
+          {/* Routes below are guarded by the Security component and the user must login to access them */}
           <Route
             path="/home"
             element={
@@ -56,4 +61,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; // Export the App component as the default export
