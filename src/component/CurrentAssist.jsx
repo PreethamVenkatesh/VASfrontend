@@ -16,6 +16,7 @@ function CurrentAssist() {
   const [customerLocation, setCustomerLocation] = useState({ lat: null, lng: null });
   const [allocatedVolunteer, setAllocatedVolunteer] = useState('');
   const [volunteerLocation, setVolunteerLocation] = useState({ lat: null, lng: null });
+  const [isRated, setIsRated] = useState(false);  // New state to track if ride is rated
   const navigate = useNavigate();
 
   const handleStartNavigation = () => {
@@ -33,25 +34,17 @@ function CurrentAssist() {
     }
   };
 
-  
-
+  // Fetch volunteer details
   useEffect(() => {
     const fetchVolunteerStatus = async () => {
       try {
-        console.log("Fetching volunteer status");
-        
         const driverEmail = localStorage.getItem('driver') || '';
 
         if (driverEmail) {
           const response = await axios.get(`http://localhost:8888/api/verify-volunteer/${driverEmail}`);
 
           if (response.data && response.data.firstName) {
-            console.log(response)
-            {response.data.status? // bookingstatus ? 
-              setVolunteerName(response.data.firstName)
-              : setVolunteerName("")
-            }
-
+            response.data.status ? setVolunteerName(response.data.firstName) : setVolunteerName("");
           } else {
             setErrorMessage('Volunteer not found or no firstName available.');
           }
@@ -67,6 +60,7 @@ function CurrentAssist() {
     fetchVolunteerStatus();
   }, []);
 
+  // Fetch booking status and if the ride is already rated
   useEffect(() => {
     const fetchBookingStatus = async () => {
       try {
@@ -76,13 +70,14 @@ function CurrentAssist() {
           const response = await axios.get(`http://localhost:8888/api/booking-status/${customerEmailId}`);
     
           if (response.data && response.data.booking) {
-            const { _id, bookingStatus, custLocationLat, custLocationLong, allocatedVolunteer } = response.data.booking;
+            const { _id, bookingStatus, custLocationLat, custLocationLong, allocatedVolunteer, isRated } = response.data.booking; // Get isRated
             setBookingConfirmation(bookingStatus);
             setCustomerLocation({ lat: custLocationLat, lng: custLocationLong });
             setBookingId(_id);
+            setIsRated(isRated); // Set isRated
             localStorage.setItem('bookingId', _id);
+
             if (allocatedVolunteer) {
-              console.log('Fetching location for volunteer:', allocatedVolunteer);
               await fetchVolunteerLocation(allocatedVolunteer); 
             }
           } else {
@@ -143,6 +138,11 @@ function CurrentAssist() {
   const closeModal = () => setIsModalOpen(false);
 
   const handleModalSubmit = async () => {
+    if (isRated) {
+      setErrorMessage('You have already rated this ride.');  // Prevent multiple ratings
+      return;
+    }
+
     if (rating) {
       try {
         const bookingId = localStorage.getItem('bookingId'); 
@@ -154,6 +154,7 @@ function CurrentAssist() {
         if (response.status === 200) {
           setConfirmationMessage('Thank you for your feedback.');
           setErrorMessage('');
+          setIsRated(true);  // Mark as rated after successful submission
           closeModal();
         }
         localStorage.removeItem('bookingId');
@@ -168,20 +169,17 @@ function CurrentAssist() {
 
   const removeDriver = () => {
     localStorage.removeItem('driver');
-    // setTimeout(() => {
-    //   console.log('Driver data removed from localStorage after 10 minutes');
-    // }, 600000); // 10 minutes
     navigate('/customerPage');
   };
 
   return (
     <div style={containerStyle}>
+      <div
+        style={{ position: 'absolute', left: '5px', top: '50px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+        onClick={() => navigate('/customerPage')}>
+        <FaArrowLeft size={30} color="blue" />
+      </div>
       <div style={formContainerStyle}>
-        <div
-          style={{ position: 'absolute', left: '5px', top: '290px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-          onClick={() => navigate('/customerPage')}>
-          <FaArrowLeft size={30} color="blue" />
-        </div>
         <h2 style={headerStyle}>Current Assistance</h2>
         <form onSubmit={handleSubmit} style={formStyle}>
           <div style={formGroupStyle}>
@@ -238,16 +236,19 @@ function CurrentAssist() {
         <h2 style={modalHeaderStyle}>Rate Your Ride</h2>
         <div style={formGroupStyle}>
           <label htmlFor="rating" style={labelStyle}>Post Completion Rating:</label>
-          <input
-            type="number"
-            id="rating"
-            value={rating}
-            onChange={(e) => setRating(e.target.value)}
-            placeholder="Enter rating (1-5)"
-            min="1"
-            max="5"
-            style={inputStyle}
-          />
+          <div>
+            {[1, 2, 3, 4, 5].map((rate) => (
+              <label key={rate} style={{ marginRight: '10px' }}>
+                <input
+                  type="radio"
+                  value={rate}
+                  checked={rating === String(rate)}
+                  onChange={(e) => setRating(e.target.value)}
+                />
+                {rate}
+              </label>
+            ))}
+          </div>
         </div>
 
         <div style={formGroupStyle}>
