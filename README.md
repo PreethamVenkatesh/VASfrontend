@@ -91,19 +91,19 @@ VASBACKEND/
 ## Environment Variables
 Create a `.env` file in the `backend` directory and add the following:
 
-MONGODB_URL= mongodb+srv://manasa4960:e1SNlu1jrWAaPzL7@cluster0.cykplsz.mongodb.net/VASLiftAssist?retryWrites=true&w=majority&appName=Cluster0
+MONGODB_URL= MONGODB_URL=mongodb+srv://preethamvenkyy:rBE4FhereNyMNqKM@vasliftassist.4w3wh0p.mongodb.net/VASLiftAssist?retryWrites=true&w=majority&appName=VASLiftAssist
 
 ## Start the Application
 
 ```bash
 # Start the backend server
-cd backend
-npm start
+cd vasbackend
+npm run dev
  
 The server will run at `http://localhost:8888`
 
 # Start the frontend application
-cd frontend
+cd vasfrontend
 npm start
 
 The application will be running on 'http://localhost:3000'
