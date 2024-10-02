@@ -1,19 +1,25 @@
-// Importing necessary libraries and modules
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
+import { LoadScript, StandaloneSearchBox } from '@react-google-maps/api';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
+import { jwtDecode } from 'jwt-decode';
 
-function FutureAssist() {
-  // State variables to manage form input and messages
+const libraries = ['places'];
+
+const FutureAssist = () => {
   const [fromLocation, setFromLocation] = useState('');
+  const [fromLatLng, setFromLatLng] = useState({ lat: null, lng: null });
   const [destination, setDestination] = useState('');
+  const [destinationLatLng, setDestinationLatLng] = useState({ lat: null, lng: null });
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [futureBookings, setFutureBookings] = useState([]);
   const [showBookings, setShowBookings] = useState(false);
+  const fromSearchBoxRef = useRef(null);
+  const destinationSearchBoxRef = useRef(null);
   const navigate = useNavigate();
 
   // Get today's date in YYYY-MM-DD format
@@ -25,168 +31,180 @@ function FutureAssist() {
   const minutes = currentTime.getMinutes().toString().padStart(2, '0');
   const minTime = `${hours}:${minutes}`;
 
+  const handleFromPlaceChanged = () => {
+    const places = fromSearchBoxRef.current.getPlaces();
+    if (places && places.length > 0) {
+      const place = places[0];
+      setFromLocation(place.formatted_address || place.name);
+      const { lat, lng } = place.geometry.location;
+      setFromLatLng({ lat: lat(), lng: lng() });
+    }
+  };
+
+  const handleDestinationPlaceChanged = () => {
+    const places = destinationSearchBoxRef.current.getPlaces();
+    if (places && places.length > 0) {
+      const place = places[0];
+      setDestination(place.formatted_address || place.name);
+      const { lat, lng } = place.geometry.location;
+      setDestinationLatLng({ lat: lat(), lng: lng() });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate the booking time based on the selected date
-    const selectedDate = new Date(date);
-    const isToday = selectedDate.toISOString().split('T')[0] === today;
-    
-    if (isToday && time < minTime) {
-      // Check if time is before the current time on the same day
-      setErrorMessage('Time must be after the current time for today\'s bookings.');
-      return;
-    }
-
-    // Check if all required fields are filled
-    if (fromLocation && destination && date && time) {
+    if (
+      fromLatLng.lat &&
+      fromLatLng.lng &&
+      destinationLatLng.lat &&
+      destinationLatLng.lng &&
+      date &&
+      time
+    ) {
       try {
-        // Send a POST request to book future assistance
         const response = await axios.post('http://localhost:8888/api/futurelocation', {
           fromLocation,
           destination,
           date,
-          time
+          time,
+          fromLat: fromLatLng.lat,
+          fromLng: fromLatLng.lng,
+          destLat: destinationLatLng.lat,
+          destLng: destinationLatLng.lng,
         });
 
-         // Handle successful booking
         if (response.status === 201) {
           setConfirmationMessage(`Your lift has been scheduled from ${fromLocation} to ${destination} on ${date} at ${time}.`);
-          setErrorMessage(''); 
-          console.log(response);
+          setErrorMessage('');
         }
       } catch (error) {
-        // Handle errors during the booking process
         setErrorMessage('Error booking the request. Please try again.');
         setConfirmationMessage('');
         console.error('Error:', error);
       }
     } else {
-      // Handle case where fields are not filled
       setConfirmationMessage('');
-      setErrorMessage('Please fill in all the fields.');
+      setErrorMessage('Please fill in all fields correctly.');
     }
   };
 
-  // Handle viewing future bookings
   const handleViewBookings = async () => {
     try {
-      // Send a GET request to fetch future bookings
       const response = await axios.get('http://localhost:8888/api/futurebookings');
-      setFutureBookings(response.data);  // Set bookings data from response
-      setShowBookings(true); // Show bookings
+      setFutureBookings(response.data);
+      setShowBookings(true);
     } catch (error) {
       console.error('Error fetching future bookings:', error);
-      setErrorMessage('No Future Bookings done');
+      setErrorMessage('Error fetching future bookings');
     }
   };
 
-  // Handle closing the bookings display
   const handleCloseBookings = () => {
     setShowBookings(false);
   };
 
   return (
-    <div style={pageContainerStyle}> 
-      <div style={containerStyle}>
-        {/* Back button to navigate to the customer page */}
-        <div
-          style={{position: 'absolute', left: '40px', top: '80px', cursor: 'pointer', display: 'flex', alignItems: 'center'}}
-          onClick={() => navigate('/customerPage')}> 
-          <FaArrowLeft size={30} color="blue" />
+    <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
+      <div style={pageContainerStyle}>
+        <div style={containerStyle}>
+          <div
+            style={{ position: 'absolute', left: '40px', top: '80px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            onClick={() => navigate('/customerPage')}
+          >
+            <FaArrowLeft size={30} color="blue" />
+          </div>
+          <h2 style={headerStyle}>Book Future Assistance</h2>
+          <form onSubmit={handleSubmit} style={formStyle}>
+            <div style={formGroupStyle}>
+              <label htmlFor="from" style={labelStyle}>From:</label>
+              <StandaloneSearchBox
+                onLoad={ref => (fromSearchBoxRef.current = ref)}
+                onPlacesChanged={handleFromPlaceChanged}
+              >
+                <input
+                  type="text"
+                  value={fromLocation}
+                  onChange={(e) => setFromLocation(e.target.value)}
+                  placeholder="Enter your current location"
+                  style={inputStyle}
+                />
+              </StandaloneSearchBox>
+            </div>
+
+            <div style={formGroupStyle}>
+              <label htmlFor="destination" style={labelStyle}>Destination:</label>
+              <StandaloneSearchBox
+                onLoad={ref => (destinationSearchBoxRef.current = ref)}
+                onPlacesChanged={handleDestinationPlaceChanged}
+              >
+                <input
+                  type="text"
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  placeholder="Enter the destination"
+                  style={inputStyle}
+                />
+              </StandaloneSearchBox>
+            </div>
+
+            <div style={formGroupStyle}>
+              <label htmlFor="date" style={labelStyle}>Date:</label>
+              <input
+                type="date"
+                id="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                min={today} // Set minimum date to today
+                style={inputStyle}
+              />
+            </div>
+
+            <div style={formGroupStyle}>
+              <label htmlFor="time" style={labelStyle}>Time:</label>
+              <input
+                type="time"
+                id="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                min={date === today ? minTime : '00:00'} // Set minimum time based on the date selected
+                style={inputStyle}
+              />
+            </div>
+
+            <button type="submit" style={buttonStyle}>Confirm</button>
+          </form>
+
+          {confirmationMessage && (
+            <p style={confirmationStyle}>{confirmationMessage}</p>
+          )}
+
+          {errorMessage && (
+            <p style={errorStyle}>{errorMessage}</p>
+          )}
+
+          <button onClick={handleViewBookings} style={buttonStyle}>View Future Bookings</button>
+
+          {showBookings && (
+            <div style={bookingsContainerStyle}>
+              <h3>Future Bookings:</h3>
+              <ul>
+                {futureBookings.map((booking, index) => (
+                  <li key={index}>
+                    {booking.fromLocation} to {booking.destination} on {new Date(booking.date).toLocaleDateString()} at {booking.time}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={handleCloseBookings} style={closeButtonStyle}>Close</button>
+            </div>
+          )}
         </div>
-        {/* Header for booking section */}
-        <h2 style={headerStyle}>Book Future Assistance</h2>
-        <form onSubmit={handleSubmit} style={formStyle}>
-          <div style={formGroupStyle}>
-            <label htmlFor="from" style={labelStyle}>From:</label>
-            <input
-              type="text"
-              id="from"
-              value={fromLocation}
-              onChange={(e) => setFromLocation(e.target.value)} // Update state on input change
-              placeholder="Enter your current location"
-              style={inputStyle}
-            />
-          </div>
-
-           {/* Destination Input */}
-          <div style={formGroupStyle}>
-            <label htmlFor="destination" style={labelStyle}>Destination:</label>
-            <input
-              type="text"
-              id="destination"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              placeholder="Enter the destination"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Date Input */}
-          <div style={formGroupStyle}>
-            <label htmlFor="date" style={labelStyle}>Date:</label>
-            <input
-              type="date"
-              id="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)} // Update state on input change
-              min={today} // Set minimum date to today
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Time Input */}
-          <div style={formGroupStyle}>
-            <label htmlFor="time" style={labelStyle}>Time:</label>
-            <input
-              type="time"
-              id="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)} // Update state on input change
-              min={date === today ? minTime : "00:00"} // Set minimum time to current time if today
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Submit button */}
-          <button type="submit" style={buttonStyle}>Confirm</button>
-        </form>
-
-        {/* Confirmation message display */}
-        {confirmationMessage && (
-          <p style={confirmationStyle}>{confirmationMessage}</p>
-        )}
-
-        {/* Error message display */}
-        {errorMessage && (
-          <p style={errorStyle}>{errorMessage}</p>
-        )}
-
-        {/* Button to view future bookings */}
-        <button onClick={handleViewBookings} style={buttonStyle}>View Future Bookings</button>
-
-        {/* Display future bookings if available */}
-        {showBookings && (
-          <div style={bookingsContainerStyle}>
-            <h3>Future Bookings:</h3>
-            <ul>
-              {futureBookings.map((booking, index) => (
-                <li key={index}>
-                  {/* Display each booking */}
-                  {booking.fromLocation} to {booking.destination} on {new Date(booking.date).toLocaleDateString()} at {booking.time}
-                </li>
-              ))}
-            </ul>
-            <button onClick={handleCloseBookings} style={closeButtonStyle}>Close</button>
-          </div>
-        )}
       </div>
-    </div>
+    </LoadScript>
   );
 }
 
-// Styles for the component
+// Styles (same as before)
 const pageContainerStyle = {
   minHeight: '100vh',
   display: 'flex',
@@ -201,9 +219,8 @@ const containerStyle = {
   fontFamily: 'Arial, sans-serif',
   textAlign: 'center',
   backgroundColor: 'yellow', 
-  backgroundSize: 'cover',
   borderRadius: '8px',
-  maxWidth: '400px',
+  maxWidth: '600px',
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 };
 
@@ -241,43 +258,41 @@ const inputStyle = {
 };
 
 const buttonStyle = {
-  padding: '0.75rem 1.5rem',
+  padding: '0.5rem 1rem',
   backgroundColor: 'blue',
   color: 'white',
   border: 'none',
   borderRadius: '4px',
   cursor: 'pointer',
-  marginTop: '1rem',
 };
 
 const confirmationStyle = {
-  marginTop: '1.5rem',
   color: 'green',
   fontWeight: 'bold',
+  marginTop: '1rem',
 };
 
 const errorStyle = {
-  marginTop: '1.5rem',
   color: 'red',
-  fontWeight: 'bold',
+  marginTop: '1rem',
 };
 
 const bookingsContainerStyle = {
-  marginTop: '1.5rem',
+  marginTop: '1rem',
   padding: '1rem',
-  backgroundColor: 'lightblue',
+  border: '1px solid #ccc',
   borderRadius: '4px',
-  textAlign: 'left',
+  backgroundColor: '#f9f9f9',
 };
 
 const closeButtonStyle = {
+  marginTop: '1rem',
   padding: '0.5rem 1rem',
   backgroundColor: 'red',
   color: 'white',
   border: 'none',
   borderRadius: '4px',
   cursor: 'pointer',
-  marginTop: '1rem',
 };
 
-export default FutureAssist; // Exporting the FutureAssist component
+export default FutureAssist;
