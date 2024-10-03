@@ -1,13 +1,15 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { LoadScript, StandaloneSearchBox } from '@react-google-maps/api';
+import { StandaloneSearchBox } from '@react-google-maps/api';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import { jwtDecode } from 'jwt-decode';
+import useGoogleMaps from '../volunteer/GoogleMaps'; 
 
 const libraries = ['places'];
 
 const FutureAssist = () => {
+  const { isLoaded, loadError } = useGoogleMaps(); // Using the custom hook for loading Google Maps API
   const [fromLocation, setFromLocation] = useState('');
   const [fromLatLng, setFromLatLng] = useState({ lat: null, lng: null });
   const [destination, setDestination] = useState('');
@@ -104,8 +106,17 @@ const FutureAssist = () => {
     setShowBookings(false);
   };
 
+  // If there is an error loading the Google Maps API, display an error message
+  if (loadError) {
+    return <p>Error loading Google Maps: {loadError}</p>;
+  }
+  // Render a loading message while the API is being loaded
+  if (!isLoaded) {
+    return <p>Loading Google Maps...</p>;
+  }
+
   return (
-    <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
+    // <LoadScript googleMapsApiKey="AIzaSyAyy8CB38wO_EDwAG8bO_WuKrO46JrvKt0" libraries={libraries}>
       <div style={pageContainerStyle}>
         <div style={containerStyle}>
           <div
@@ -200,7 +211,7 @@ const FutureAssist = () => {
           )}
         </div>
       </div>
-    </LoadScript>
+    // </LoadScript>
   );
 }
 
